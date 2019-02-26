@@ -8,20 +8,35 @@ import (
     "strings"
 )
 
-func main() {
-    reader := bufio.NewReader(os.Stdin)
-    unseal_count := flag.Int("unsealing-keys", 3, "The number of keys that are required to unseal the vault. You will be prompt for them after this")
-    flag.Parse()
-    fmt.Println("Unsealing key count: ", *unseal_count)
+// Setting default unseal key count
+const unsealKeyCount = 3
 
+
+func getKeyCount() int {
+    keyCount := flag.Int("unsealing-keys", unsealKeyCount, "The number of keys that are required to unseal the vault. You will be prompt for them after this")
+    flag.Parse()
+    return *keyCount
+}
+
+func readKeys(keyCount int) []string {
     // Save the unsealing keys in a slice
+    // Need to move it to memguard so its safe in memory
     var keys []string
-    for i:= 1; i < *unseal_count + 1; i++ {
+    reader := bufio.NewReader(os.Stdin)
+    for i:= 1; i < keyCount + 1; i++ {
         fmt.Printf("Unsealing key %d: ", i)
         text, _ := reader.ReadString('\n')
         // convert CRLF to LF
         text = strings.Replace(text, "\n", "", -1)
         keys = append(keys, text)
     }
+    return keys
+}
+
+func main() {
+    // var key_count int
+    keyCount := getKeyCount()
+    fmt.Println("Unsealing key count: ", keyCount)
+    keys := readKeys(keyCount)
     fmt.Println(keys)
 }
