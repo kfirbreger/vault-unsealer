@@ -65,6 +65,12 @@ func instanceMonitor(vault *Vault, instance *Instance, status chan int, keys *[]
         } else if !unsealed {
             // This instance is sealed and needs to be unsealed
             for i := 0;i < len(keys); i++ {
+                payload := unsealparams {
+                    Key: &(*keys[i])
+                    reset: false
+                    migrate: false
+                }
+                go unsealCall(unsealUrl, payload)
                 // Create payload
                 // Do a put (post?) request
             }
