@@ -8,6 +8,12 @@ unseal_key_count = 3
 # Interval in ms
 seal_check_interval = 100
 
+[workers]
+# The amout of workers to make
+status_check = 3
+unseal = 3
+logging = 1
+
 [servers]
     # Server instances in the cluster
     [[instance]]
