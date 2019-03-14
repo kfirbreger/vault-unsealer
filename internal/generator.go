@@ -6,16 +6,16 @@ import (
 )
 
 
-func GenerateChecks(<-chan StatusChecks, domain string, protocol string, statusPath string, interval int) {
+func GenerateChecks(statusCheck <-chan StatusCheckRequest, domain string, protocol string, statusPath string, interval int) {
     // Making a map with the params
     url := protocol + '://' + domain + '/' + statusPath
     // Defining the other parameters
     name := "Status check for " + domain
     for {
         // Creating work
-        work := CheckRequest{Name: name, Url: url}
+        work := StatusCheckRequest{Name: name, Url: url}
         // Adding it to the work queue
-        StatusChecks <- work
+        statusCheck <- work
         // Waiting before next call
         time.Sleep(interval)
     }
