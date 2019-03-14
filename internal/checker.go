@@ -1,6 +1,7 @@
 package unsealer
 
 import (
+    "fmt"
     "http"
 )
 
@@ -10,75 +11,82 @@ const CONTINUE = 2
 const PAUZE = 3
 const STATUS = 5
 
-type Worker struct {
+type Checker struct {
     ID int
-    Work chan WorkRequest
-    WorkerQueue chan chan WorkRequest
+    StatusCheckQueue chan StatusCheckRequest
+    UnsealQueue chan UnsealRequest
     ManageChan chan int
+    LogChan <-chan string
+    CallsMade int
+    CallsSuccesful int
+    UnsealRequests int
 }
 
-func NewWorker(id int, workerQueue chan chan WorkRequest) Worker {
+func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue chan UnsealRequest, logChan chan string) *Checker {
     // Creating a new worker
-    worker := Worker{
+    checker := Checker{
         ID: id,
-        Work: make(chan WorkRequest),
-        WorkerQueue: workerQueue,
+        StatusCheckQueue: statusCheckQueue,
         ManageChan: make(chan int)
+        LogChan: logChan
+        CallsMade: 0
+        CallsSuccessful: 0
+        UnsealRequests: 0
     }
 
-    return worker
+    return &checker
 }
 
-func (w *Worker) call(url) (int, err) {
+// this is set as a differenct function so that
+// the actual check can be done differently (like listening to kubernetes api)
+// without significant change code
+func ExecCheckOverHttp(url) (int, err) {
     // Makeing a call, returning the status code, or error code
     resp, err = http.get(url)
     // Debuging info
     if err != nil {
-        fmt.Println('Vault is sealed. Needs unsealing')
+        fmt.Println('Error calling to Vault. is Vault sealed?')
         fmt.Println(err)
     }
     fmt.Println('StatusCode: %d', resp.StatusCode)
     return resp.StatusCode, err
 }
 
-func (w *Worker) Start() {
+// @TODO replace all fmt with log channel publishing
+func (c *Checker) Start() {
     go func() {
-        // Some statistics
-        callsMade := 0
-        callsSuccesful := 0
-        unsealedInitiated := 0
         for {
             // Making worker available
-            w.WorkerQueue <- w.Work
+            c.WorkerQueue <- c.Work
             
             select {
-            case work := <- w.Work:
-            // Recieve work request
-            fmt.Printf("worker%d: Received work request", w.ID)
-            callsMade++
-
-            StatusCode, err = w.call(work.Url)
-            // Checking vault status
-            if ====SEAL CONDITIONS==== {
-                unsealedInitiated++
-                @TODO generate unseal work
-            } else if StatusCode > 199 && StatusCode < 300 && err == nil {
-                callsSuccesful++
-            }
+            case work := <- c.Work:
+                // Recieve work request
+                fmt.Printf("worker%d: Received check request for url %s", c.ID, work.Url)
+                
+                c.CallsMade++
+                StatusCode, err = ExecCheckOverHttp(work.Url)
+                // Checking vault status
+                if ====SEAL CONDITIONS==== {
+                    c.UnsealRequest++
+                    // @TODO generate unseal work
+                } else if StatusCode > 199 && StatusCode < 300 && err == nil {
+                    c.CallsSuccesful++
+                }
 
             case cmd := <- w.ManageChan:
-            fmt.Printf("Command recieved: %d", cmd)
-            switch {
-            case cmd == QUIT:
-                fmt.Printf("Worker %d quitting", w.ID)
-                return
+                fmt.Printf("Command recieved: %d", cmd)
+                switch cmd {
+                case QUIT:
+                    fmt.Printf("Worker %d quitting", w.ID)
+                    return
 
-            case cmd == STATUS:
-                fmt.Printf("Statistics:\n=======================\nCalls made: %d\nCalls succesfull: %d\nUnseal initiated: %d\n", callsMade, callsSuccesful, unsealedInitiated)
+                case STATUS:
+                    fmt.Printf("Statistics:\n=======================\nCalls made: %d\nCalls succesfull: %d\nUnseal initiated: %d\n", c.CallsMade, c.CallsSuccesful, ic.UnsealRequests)
 
-            default:
-                fmt.Printf("Command %d not (yet) supported", cmd)
-            }
+                default:
+                    fmt.Printf("Command %d not (yet) supported", cmd)
+                }
             }
         }
     }
@@ -86,7 +94,7 @@ func (w *Worker) Start() {
 
 
 // Adding worker stop function
-func (w *Worker) Stop() {
-    w.ManageChan <- QUIT
+func (c *Checker) Stop() {
+    c.ManageChan <- QUIT
 }
 

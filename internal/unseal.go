@@ -5,15 +5,47 @@ import (
     "fmt"
     "http"
     "time"
-)
+) 
 
 
 type unsealparams struct {
-    Key *string `json:"key"`
+    Keys *[]string `json:"key"`
     reset bool
     migrate bool
 }
 
+
+type Unsealer struct {
+    ID int
+    UnsealQueue chan UnsealRequest
+    ManageChan chan int
+    LogChan <- chan string
+    params *unsealparams
+}
+
+func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, *up unsealparams) Unsealer {
+    unsealer := Unsealer {
+        ID: id
+        UnsealQueue : unsealQueue
+        LogChan logchan
+        params: up
+    }
+
+    return unsealer
+}
+
+func (u *Unsealer) Start() {
+    go func {
+        UnsealRequestSuccesful := chan bool  // Track unseal request
+        // Wait until there is an unseal request
+        for unsealRequest := range u.UnsealQueue {
+            // Performing the unsealing request
+
+            
+
+
+
+func unsealCall
 
 func checkStatus(url) (bool, error) {
     // Checks the vault status
@@ -36,7 +68,7 @@ func checkStatus(url) (bool, error) {
 func unsealCall(url string, payload unsealparams) (status int, err error) {
     /* Making an unseal call for an instance */
     // Converting the payload to a byte array
-    jsonBytesPayload := []byte(json.Marshal(payload))
+
     req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonBytesPayload)
     
     // Cleaning key from memory
