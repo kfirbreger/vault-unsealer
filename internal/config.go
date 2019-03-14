@@ -20,8 +20,15 @@ type VaultConf struct {
     CheckInterval int `toml:seal_check_interval`
 }
 
+type WorkersConf struct {
+    StatusCheckCount int `toml:status_check`
+    UnsealCount int `toml:unseal`
+    LoggingCount int `toml:logging`
+}
+
 type Service struct {
     Vault VaultConf
+    Workers WorkersConf
     Servers ServersList
 }
 
@@ -64,3 +71,4 @@ func getCliParams() CliParams {
 func updateConfig(serv *Service, params *CliParams) {
     return nil
 }
+
