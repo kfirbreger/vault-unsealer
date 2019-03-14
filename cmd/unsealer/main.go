@@ -49,5 +49,10 @@ func main() {
     }
 
     // Creating the Status check generators
-    for {
+    for i := 0; i < len(conf.Servers); i++ {
+        go unsealer.GenerateChecks(checkerQueue, conf.Servers[i].Domain, conf.Vault.Protocol, conf.Vault.StatusPath, conf.Vault.CheckInterval)
+    }
+    // Just let the program do its work
+    for { }
+}
 
