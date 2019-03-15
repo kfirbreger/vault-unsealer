@@ -7,13 +7,14 @@ import (
     "time"
 ) 
 
+const UNSEALCALLERROR -1
+
 
 type unsealparams struct {
     Keys *[]string `json:"key"`
     reset bool
     migrate bool
 }
-
 
 type Unsealer struct {
     ID int
@@ -22,6 +23,7 @@ type Unsealer struct {
     LogChan <- chan string
     params *unsealparams
 }
+
 
 func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, *up unsealparams) Unsealer {
     unsealer := Unsealer {
@@ -39,9 +41,14 @@ func (u *Unsealer) Start() {
         // Wait until there is an unseal request
         for unsealRequest := range u.UnsealQueue {
             // Performing the unsealing request
-            
-            
-
+            if unsealRequest.KeyNumber >= len(u.params.Keys) {. // Sanity check
+                // Making sure there is a key available
+                fmt.Printf("Key %d is out of range", unsealRequest.KeyNumber)
+            }
+            status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.url, u.params.reset, u.params, migrate)
+        }
+    }
+}
 
 
 func ExecUnsealOverHttp(key *string, url string, reset bool, migrate bool) (status int, err error) {
