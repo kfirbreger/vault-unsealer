@@ -36,16 +36,35 @@ func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, *u
 
 func (u *Unsealer) Start() {
     go func {
-        UnsealRequestSuccesful := chan bool  // Track unseal request
         // Wait until there is an unseal request
         for unsealRequest := range u.UnsealQueue {
             // Performing the unsealing request
-
+            
             
 
 
 
-func unsealCall
+func ExecUnsealOverHttp(key *string, url string, reset bool, migrate bool) (status int, err error) {
+    // Perform an unseal request over http(s)
+    // Again key is passed as pointer to prevent leaking to gc
+    
+    // Creating a buffer with the key. This is unfortunaltely unavoidable
+    jsonBytesPayload := json() // TODO how does this work again?
+    
+    req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonBytesPayload))
+    // clearing buffer. which should speed up memory cleaning
+    jsonBytesPayload = nil
+    
+    // Sending the request
+    client := &http.Client()
+    resp, err := client.Do(req)
+    // Making sure body is closed
+    defer resp.Body.close()
+    if err != nil {
+        return UNSEALCALLERROR, err
+    }
+    return resp.StatusCode, err
+}
 
 func checkStatus(url) (bool, error) {
     // Checks the vault status
@@ -65,24 +84,6 @@ func checkStatus(url) (bool, error) {
     return unsealed, err
 }
 
-func unsealCall(url string, payload unsealparams) (status int, err error) {
-    /* Making an unseal call for an instance */
-    // Converting the payload to a byte array
-
-    req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonBytesPayload)
-    
-    // Cleaning key from memory
-    jsonBytesPayload = nil
-
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // Making sure body is closed
-    defer resp.Body.Close()
-    if err != nil {
-        return -1, err
-    }
-    return resp.StatusCode, err
-}
 
 func instanceMonitor(vault *Vault, instance *Instance, status chan int, keys *[]string) {
     // Using status to send status update to main process
@@ -103,8 +104,6 @@ func instanceMonitor(vault *Vault, instance *Instance, status chan int, keys *[]
                     migrate: false
                 }
                 go unsealCall(unsealUrl, payload)
-                // Create payload
-                // Do a put (post?) request
             }
         }
         time.Sleep(*vault.CheckInterval * time.Millisecond)            
