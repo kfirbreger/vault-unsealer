@@ -51,10 +51,10 @@ func (u *Unsealer) Start() {
 }
 
 
-func ExecUnsealOverHttp(key *string, url string, reset bool, migrate bool) (status int, err error) {
+func ExecUnsealOverHttp(key *LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
     // Perform an unseal request over http(s)
     // Again key is passed as pointer to prevent leaking to gc
-    
+    get the key -> key.Buffer()
     // Creating a buffer with the key. This is unfortunaltely unavoidable
     jsonBytesPayload := json() // TODO how does this work again?
     
