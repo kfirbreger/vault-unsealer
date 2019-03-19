@@ -45,8 +45,8 @@ func readKeys(keyCount int) *[]LockedBuffer {
         text, _ := reader.ReadString('\n')
         // convert CRLF to LF
         text = strings.Replace(text, "\n", "", -1)
-        membuf = memguard.NewImmutableFromBytes(text)
-        keys = append(keys, membuf)
+        membuf := memguard.NewImmutableFromBytes(text)
+        keys = append(keys, &membuf)
     }
     return &keys
 }
