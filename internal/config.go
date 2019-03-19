@@ -1,6 +1,7 @@
 package internal
 
 import (
+    "flag"
 	"github.com/BurntSushi/toml"
 )
 
@@ -32,16 +33,14 @@ type Service struct {
 	Servers ServersList
 }
 
-func (s *Service) Load(filepath string) {
-	_, err := toml.decodefile(filepath, s)
+func (s *Service) Load(filepath string) error {
+	_, err := toml.DecodeFile(filepath, s)
 	// @todo add verification
 	return err
 }
 
 type CliParams struct {
 	UnsealKeyCount int
-	InstanceDomain []string
-	InstanceReset  bool
 	StatusPath     string
 	UnsealPath     string
 	Interval       int
@@ -52,13 +51,11 @@ type CliParams struct {
 func getCliParams() CliParams {
 	var params CliParams
 
-	params.UnsealKeyCount = flag.Int("unsealing-keys", nil, "The number of keys that are required to unseal the vault. You will be prompt for them after this")
-	params.InstanceDomain = flag.String("instance", "", "Add a Vault instance to the monitoring list")
-	params.InstanceReset = flag.Bool("instance-reset", false, "Remove all instances from the config")
-	params.StatusPath = flag.String("status-path", "", "Give a custom status check path")
-	params.UnsealPath = flag.String("unseal-path", "", "Give a custom unseal path")
-	params.Interval = flag.Int("check-interval", nil, "The status check interval")
-	params.Protocol = flag.String("protocol", "", "Use a custom protocol")
+	params.UnsealKeyCount = *flag.Int("unsealing-keys", 0, "The number of keys that are required to unseal the vault. You will be prompt for them after this")
+	params.StatusPath = *flag.String("status-path", "", "Give a custom status check path")
+	params.UnsealPath = *flag.String("unseal-path", "", "Give a custom unseal path")
+	params.Interval = *flag.Int("check-interval", 0, "The status check interval")
+	params.Protocol = *flag.String("protocol", "", "Use a custom protocol")
 
 	flag.Parse()
 
@@ -67,5 +64,5 @@ func getCliParams() CliParams {
 
 // Updating config from CLI, if needed
 func updateConfig(serv *Service, params *CliParams) {
-	return nil
+	return
 }
