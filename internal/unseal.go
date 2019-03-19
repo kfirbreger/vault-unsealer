@@ -3,15 +3,15 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
-	"http"
+	"net/http"
 	"runtime"
-	"time"
+	"github.com/awnumar/memguard"
 )
 
 const UNSEALCALLERROR = -1
 
 type unsealparams struct {
-	Keys    *[]LockedBuffer `json:"key"`
+	Keys    *[]memguard.LockedBuffer `json:"key"`
 	reset   bool
 	migrate bool
 }
