@@ -1,9 +1,12 @@
 package main
 
 import (
+    "os"
     "sync"
     "github.com/kfirbreger/vault-unsealer/unsealer"
 )
+
+// GODEBUG=clobberfree=1
 
 func main() {
     // Load config
