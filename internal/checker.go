@@ -2,7 +2,7 @@ package internal
 
 import (
 	"fmt"
-	"http"
+	"net/http"
 )
 
 // Constanses for the manage channel
@@ -18,7 +18,7 @@ type Checker struct {
 	ManageChan       chan int
 	LogChan          <-chan string
 	CallsMade        int
-	CallsSuccesful   int
+	CallsSuccessful   int
 	UnsealRequests   int
 }
 
@@ -40,9 +40,9 @@ func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue ch
 // this is set as a differenct function so that
 // the actual check can be done differently (like listening to kubernetes api)
 // without significant change code
-func ExecCheckOverHttp(url) (int, err) {
+func ExecCheckOverHttp(url string) (int, error) {
 	// Makeing a call, returning the status code, or error code
-	resp, err = http.get(url)
+    resp, err := http.Get(url)
 	// Debuging info
 	if err != nil {
 		fmt.Println("Error calling to Vault. is Vault sealed?")
@@ -56,33 +56,30 @@ func ExecCheckOverHttp(url) (int, err) {
 func (c *Checker) Start() {
 	go func() {
 		for {
-			// Making worker available
-			c.WorkerQueue <- c.Work
-
 			select {
-			case work := <-c.Work:
+			case work := <-c.StatusCheckQueue:
 				// Recieve work request
 				fmt.Printf("worker%d: Received check request for url %s", c.ID, work.Url)
 
 				c.CallsMade++
-				StatusCode, err = ExecCheckOverHttp(work.Url)
+                StatusCode, err := ExecCheckOverHttp(work.Url)
 				// Checking vault status
 				if StatusCode == 400 { // TODO unseal conditions
-					c.UnsealRequest++
+					c.UnsealRequests++
 					// @TODO generate unseal work
 				} else if StatusCode > 199 && StatusCode < 300 && err == nil {
-					c.CallsSuccesful++
+					c.CallsSuccessful++
 				}
 
-			case cmd := <-w.ManageChan:
+			case cmd := <-c.ManageChan:
 				fmt.Printf("Command recieved: %d", cmd)
 				switch cmd {
 				case QUIT:
-					fmt.Printf("Worker %d quitting", w.ID)
+					fmt.Printf("Worker %d quitting", c.ID)
 					return
 
 				case STATUS:
-					fmt.Printf("Statistics:\n=======================\nCalls made: %d\nCalls succesfull: %d\nUnseal initiated: %d\n", c.CallsMade, c.CallsSuccesful, ic.UnsealRequests)
+					fmt.Printf("Statistics:\n=======================\nCalls made: %d\nCalls succesfull: %d\nUnseal initiated: %d\n", c.CallsMade, c.CallsSuccessful, c.UnsealRequests)
 
 				default:
 					fmt.Printf("Command %d not (yet) supported", cmd)
