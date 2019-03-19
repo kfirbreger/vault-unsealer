@@ -1,4 +1,4 @@
-package unsealer
+package internal
 
 import (
     "fmt"

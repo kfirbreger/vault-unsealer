@@ -1,4 +1,4 @@
-package unsealer
+package internal
 
 type StatusCheckRequest struct {
     Name string
