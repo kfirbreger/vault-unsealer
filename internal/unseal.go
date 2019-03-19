@@ -4,6 +4,7 @@ import (
     "encoding/json"
     "fmt"
     "http"
+    "runtime"
     "time"
 ) 
 
@@ -11,7 +12,7 @@ const UNSEALCALLERROR -1
 
 
 type unsealparams struct {
-    Keys *[]string `json:"key"`
+    Keys *[]LockedBuffer `json:"key"`
     reset bool
     migrate bool
 }
@@ -70,6 +71,7 @@ func ExecUnsealOverHttp(key *LockedBuffer, url string, reset bool, migrate bool)
     if err != nil {
         return UNSEALCALLERROR, err
     }
+    defer runtime.GC()  // Manually triggering GC
     return resp.StatusCode, err
 }
 
