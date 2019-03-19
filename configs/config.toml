@@ -1,6 +1,6 @@
 [vault]
 # Network
-protocl = "https"
+protocol = "https"
 status_path = "/v1/sys/health?standbyok=true"
 unseal_path = "/v1/sys/unseal"
 # Settings
