@@ -1,6 +1,7 @@
 package internal
 
 import (
+    "bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 const UNSEALCALLERROR = -1
 
 type unsealparams struct {
-	Keys    *[]memguard.LockedBuffer `json:"key"`
+	Keys    []*memguard.LockedBuffer `json:"key"`
 	reset   bool
 	migrate bool
 }
@@ -28,7 +29,7 @@ func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, up
 	unsealer := Unsealer{
 		ID:          id,
 		UnsealQueue: unsealQueue,
-		LogChan:     logchan,
+		LogChan:     logChan,
 		params:      up,
 	}
 
@@ -44,12 +45,12 @@ func (u *Unsealer) Start() {
 				// Making sure there is a key available
 				fmt.Printf("Key %d is out of range", unsealRequest.KeyNumber)
 			}
-			status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.url, u.params.reset, u.params, migrate)
+			status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.reset, u.params.migrate)
 		}
 	}()
 }
 
-func ExecUnsealOverHttp(key *LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
+func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
 	// Perform an unseal request over http(s)
 	// Again key is passed as pointer to prevent leaking to gc
 	// get the key -> key.Buffer()

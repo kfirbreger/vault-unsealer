@@ -11,7 +11,7 @@ import (
 	"github.com/awnumar/memguard"
 )
 
-func GetUnsealKeys() *[]*memguard.LockedBuffer {
+func GetUnsealKeys() []*memguard.LockedBuffer {
 	/*
 	   Retrieve the unsealing keys by first getting the key count
 	   and then prompting for the keys one at a time
@@ -39,10 +39,10 @@ func getKeyCount() int {
 	return *keyCount
 }
 
-func readKeys(keyCount int) *[]*memguard.LockedBuffer {
+func readKeys(keyCount int) []*memguard.LockedBuffer {
 	// Save the unsealing keys in a slice
 	// Need to move it to memguard so its safe in memory
-	var keys []*memguard.LockedBuffer
+    keys := make([]*memguard.LockedBuffer, keyCount)
 	reader := bufio.NewReader(os.Stdin)
 	for i := 1; i < keyCount+1; i++ {
 		fmt.Printf("Unsealing key %d: ", i)
@@ -52,5 +52,5 @@ func readKeys(keyCount int) *[]*memguard.LockedBuffer {
 		membuf, err := memguard.NewImmutableFromBytes(text)
 		keys = append(keys, membuf)
 	}
-	return &keys
+	return keys
 }
