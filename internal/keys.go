@@ -1,15 +1,17 @@
 package internal
 
 import (
+    "bytes"
     "bufio"
     "flag"
 	"fmt"
     "os"
+    "strconv"
     "strings"
 	"github.com/awnumar/memguard"
 )
 
-func GetUnsealKeys() *[]memguard.LockedBuffer {
+func GetUnsealKeys() *[]*memguard.LockedBuffer {
 	/*
 	   Retrieve the unsealing keys by first getting the key count
 	   and then prompting for the keys one at a time
@@ -24,9 +26,9 @@ func GetUnsealKeys() *[]memguard.LockedBuffer {
 	if keyCount == 0 {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Unsealing key count: ")
-		text, _ := reader.ReadString("\n")
+		text, _ := reader.ReadString('\n')
 		text = strings.Replace(text, "\n", "", -1)
-		keyCount = int(text)
+		keyCount, _ = strconv.Atoi(text)
 	}
 	return readKeys(keyCount)
 }
@@ -37,18 +39,18 @@ func getKeyCount() int {
 	return *keyCount
 }
 
-func readKeys(keyCount int) *[]memguard.LockedBuffer {
+func readKeys(keyCount int) *[]*memguard.LockedBuffer {
 	// Save the unsealing keys in a slice
 	// Need to move it to memguard so its safe in memory
-	var keys [keyCount]*memguard.LockedBuffer
+	var keys []*memguard.LockedBuffer
 	reader := bufio.NewReader(os.Stdin)
 	for i := 1; i < keyCount+1; i++ {
 		fmt.Printf("Unsealing key %d: ", i)
-		text, _ := reader.ReadString('\n')
+		text, _ := reader.ReadBytes('\n')
 		// convert CRLF to LF
-		text = strings.Replace(text, "\n", "", -1)
-		membuf := memguard.NewImmutableFromBytes(text)
-		keys = append(keys, &membuf)
+		text = bytes.TrimSpace(text)
+		membuf, err := memguard.NewImmutableFromBytes(text)
+		keys = append(keys, membuf)
 	}
 	return &keys
 }
