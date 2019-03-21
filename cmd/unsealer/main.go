@@ -2,8 +2,6 @@ package main
 
 import (
 	"github.com/kfirbreger/vault-unsealer/internal"
-	"os"
-	"sync"
 )
 
 // GODEBUG=clobberfree=1
@@ -31,22 +29,22 @@ func main() {
 	logChan := make(chan string, 10)
 
 	// Creating Cehcker workers
-	var checkers [conf.Workers.StatusCheckCount]internal.Checker
-	var unsealers [conf.Workers.UnsealCount]internal.Unsealer
-	var loggers [conf.Workers.LoggingCount]string // TODO add loggers
+    checkers := make([]*internal.Checker, 0, conf.Workers.StatusCheckCount)
+    unsealers := make([]*internal.Unsealer, 0, conf.Workers.UnsealCount)
+    loggers := make([]string, 0, conf.Workers.LoggingCount) // TODO add loggers
 
-	for i := 0; i < len(checkers); i++ {
+	for i := 0; i < conf.Workers.StatusCheckCount; i++ {
 		// Creating checkers
-		c := NewChecker(i, checkerQueue, unsealQueue, logChan)
-		*c.Start()
+		c := internal.NewChecker(i, checkerQueue, unsealQueue, logChan)
+		(*c).Start()
 		checkers[i] = c
 	}
 
 	// Creating unseal params
-	up := *internal.unsealparams{*keys, false, false}
+	up := &internal.Unsealparams{*keys, false, false}
 	// Creating unsealer workers
-	for i := 0; i < len(unsealQueue); i++ {
-		u = NewUnsealer(i, unsealQueue, logChan, up)
+	for i := 0; i < conf.Workers.UnsealCount; i++ {
+		u = internal.NewUnsealer(i, unsealQueue, logChan, up)
 		*u.Start()
 		unsealers[i] = u
 	}
