@@ -50,6 +50,9 @@ func readKeys(keyCount int) []*memguard.LockedBuffer {
 		// convert CRLF to LF
 		text = bytes.TrimSpace(text)
 		membuf, err := memguard.NewImmutableFromBytes(text)
+        if err != nil {
+            fmt.Println("Eror creating memory safe storage")
+        }
 		keys = append(keys, membuf)
 	}
 	return keys

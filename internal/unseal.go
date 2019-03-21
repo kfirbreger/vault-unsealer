@@ -2,7 +2,6 @@ package internal
 
 import (
     "bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"runtime"
@@ -12,7 +11,7 @@ import (
 const UNSEALCALLERROR = -1
 
 type unsealparams struct {
-	Keys    []*memguard.LockedBuffer `json:"key"`
+	Keys    []*memguard.LockedBuffer 
 	reset   bool
 	migrate bool
 }
@@ -21,7 +20,7 @@ type Unsealer struct {
 	ID          int
 	UnsealQueue chan UnsealRequest
 	ManageChan  chan int
-	LogChan     <-chan string
+	LogChan     chan<- string
 	params      *unsealparams
 }
 
@@ -46,6 +45,10 @@ func (u *Unsealer) Start() {
 				fmt.Printf("Key %d is out of range", unsealRequest.KeyNumber)
 			}
 			status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.reset, u.params.migrate)
+            if err != nil {
+                fmt.Println("Error sending unseal call")
+            }
+            fmt.Printf("Unseal returned status code %d", status)
 		}
 	}()
 }
@@ -53,19 +56,16 @@ func (u *Unsealer) Start() {
 func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
 	// Perform an unseal request over http(s)
 	// Again key is passed as pointer to prevent leaking to gc
-	// get the key -> key.Buffer()
-	// Creating a buffer with the key. This is unfortunaltely unavoidable
-	jsonBytesPayload := json() // TODO how does this work again?
-
-	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonBytesPayload))
-	// clearing buffer. which should speed up memory cleaning
-	jsonBytesPayload = nil
+	
+    // Creating a buffer with the key. This is unfortunaltely unavoidable
+    // TODO add reset and migrate options to the call
+    req, err := http.NewRequest("PUT", url, bytes.NewBuffer(append([]byte(`{"key":"`), append((*key).Buffer(), []byte(`"}`)...)...)))
 
 	// Sending the request
-	client := &http.Client()
+	client := &http.Client{}
 	resp, err := client.Do(req)
 	// Making sure body is closed
-	defer resp.Body.close()
+	defer resp.Body.Close()
 	if err != nil {
 		return UNSEALCALLERROR, err
 	}
