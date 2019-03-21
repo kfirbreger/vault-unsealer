@@ -66,3 +66,11 @@ func getCliParams() CliParams {
 func updateConfig(serv *Service, params *CliParams) {
 	return
 }
+
+func LoadConfiguration() *Service {
+    var conf *Service
+    conf.Load("configs/config.toml")
+    // TODO add cli params
+    return conf
+}
+
