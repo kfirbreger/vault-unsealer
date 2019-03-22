@@ -31,7 +31,7 @@ func main() {
 	// Creating Cehcker workers
     checkers := make([]*internal.Checker, 0, conf.Workers.StatusCheckCount)
     unsealers := make([]*internal.Unsealer, 0, conf.Workers.UnsealCount)
-    loggers := make([]string, 0, conf.Workers.LoggingCount) // TODO add loggers
+    // loggers := make([]string, 0, conf.Workers.LoggingCount) // TODO add loggers
 
 	for i := 0; i < conf.Workers.StatusCheckCount; i++ {
 		// Creating checkers
@@ -41,11 +41,11 @@ func main() {
 	}
 
 	// Creating unseal params
-	up := &internal.Unsealparams{*keys, false, false}
+	up := &internal.Unsealparams{keys, false, false}
 	// Creating unsealer workers
 	for i := 0; i < conf.Workers.UnsealCount; i++ {
-		u = internal.NewUnsealer(i, unsealQueue, logChan, up)
-		*u.Start()
+        u := internal.NewUnsealer(i, unsealQueue, logChan, up)
+		(*u).Start()
 		unsealers[i] = u
 	}
 
