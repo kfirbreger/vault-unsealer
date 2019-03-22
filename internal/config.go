@@ -28,7 +28,7 @@ type WorkersConf struct {
 type Service struct {
 	Vault   VaultConf
 	Workers WorkersConf
-	Servers []Instance
+    Servers []Instance `toml:"server"`
 }
 
 func Load(filepath string, s *Service) {

@@ -15,11 +15,11 @@ unseal = 3
 logging = 1
 
 # Server instances in the cluster
-[[instance]]
+[[server]]
 domain = "vault-0.cluster.local"
 
-[[instance]]
+[[server]]
 domain = "vault-1.cluster.local"
 
-[[instance]]
+[[server]]
 domain = "vault-2.cluster.local"
