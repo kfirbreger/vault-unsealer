@@ -47,6 +47,7 @@ func ExecCheckOverHttp(url string) (int, error) {
 	if err != nil {
 		fmt.Println("Error calling to Vault. is Vault sealed?")
 		fmt.Println(err)
+        return -1, err
 	}
 	fmt.Println("StatusCode: %d", resp.StatusCode)
 	return resp.StatusCode, err
@@ -59,7 +60,7 @@ func (c *Checker) Start() {
 			select {
 			case work := <-c.StatusCheckQueue:
 				// Recieve work request
-				fmt.Printf("worker%d: Received check request for url %s", c.ID, work.Url)
+				fmt.Printf("worker%d: Received check request for url %s\n", c.ID, work.Url)
 
 				c.CallsMade++
                 StatusCode, err := ExecCheckOverHttp(work.Url)
