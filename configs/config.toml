@@ -14,13 +14,12 @@ status_check = 3
 unseal = 3
 logging = 1
 
-[servers]
-    # Server instances in the cluster
-    [[instance]]
-    domain = "vault-0.cluster.local"
+# Server instances in the cluster
+[[instance]]
+domain = "vault-0.cluster.local"
 
-    [[instance]]
-    domain = "vault-1.cluster.local"
+[[instance]]
+domain = "vault-1.cluster.local"
 
-    [[instance]]
-    domain = "vault-2.cluster.local"
+[[instance]]
+domain = "vault-2.cluster.local"

@@ -2,7 +2,9 @@ package internal
 
 import (
     "flag"
-	"github.com/BurntSushi/toml"
+    "fmt"
+
+    "github.com/BurntSushi/toml"
 )
 
 type Instance struct {
@@ -10,17 +12,17 @@ type Instance struct {
 }
 
 type VaultConf struct {
-	Protocol       string
-	StatusPath     string `toml:status_path`
-	UnsealPath     string `toml:unseal_path`
-	UnsealKeyCount string `toml:unseal_key_path`
-	CheckInterval  int    `toml:seal_check_interval`
+    Protocol       string 
+	StatusPath     string `toml:"status_path"`
+	UnsealPath     string `toml:"unseal_path"`
+	UnsealKeyCount int `toml:"unseal_key_count"`
+	CheckInterval  int    `toml:"seal_check_interval"`
 }
 
 type WorkersConf struct {
-	StatusCheckCount int `toml:status_check`
-	UnsealCount      int `toml:unseal`
-	LoggingCount     int `toml:logging`
+	StatusCheckCount int `toml:"status_check"`
+	UnsealCount      int `toml:"unseal"`
+	LoggingCount     int `toml:"logging"`
 }
 
 type Service struct {
@@ -29,10 +31,12 @@ type Service struct {
 	Servers []Instance
 }
 
-func (s *Service) Load(filepath string) error {
-	_, err := toml.DecodeFile(filepath, s)
+func Load(filepath string, s *Service) {
+	if _, err := toml.DecodeFile(filepath, s); err != nil {
+        fmt.Println(err)
+    }
+    fmt.Println(*s)
 	// @todo add verification
-	return err
 }
 
 type CliParams struct {
@@ -64,9 +68,9 @@ func updateConfig(serv *Service, params *CliParams) {
 }
 
 func LoadConfiguration() *Service {
-    var conf *Service
-    conf.Load("configs/config.toml")
+    var conf Service
+    Load("./config.toml", &conf)
     // TODO add cli params
-    return conf
+    return &conf
 }
 
