@@ -9,10 +9,6 @@ type Instance struct {
 	Domain string
 }
 
-type ServersList struct {
-	Instances []Instance
-}
-
 type VaultConf struct {
 	Protocol       string
 	StatusPath     string `toml:status_path`
@@ -30,7 +26,7 @@ type WorkersConf struct {
 type Service struct {
 	Vault   VaultConf
 	Workers WorkersConf
-	Servers ServersList
+	Servers []Instance
 }
 
 func (s *Service) Load(filepath string) error {
