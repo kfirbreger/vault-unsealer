@@ -10,10 +10,10 @@ import (
 
 const UNSEALCALLERROR = -1
 
-type unsealparams struct {
+type Unsealparams struct {
 	Keys    []*memguard.LockedBuffer 
-	reset   bool
-	migrate bool
+	Reset   bool
+	Migrate bool
 }
 
 type Unsealer struct {
@@ -21,10 +21,10 @@ type Unsealer struct {
 	UnsealQueue chan UnsealRequest
 	ManageChan  chan int
 	LogChan     chan<- string
-	params      *unsealparams
+	params      *Unsealparams
 }
 
-func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, up *unsealparams) *Unsealer {
+func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, up *Unsealparams) *Unsealer {
 	unsealer := Unsealer{
 		ID:          id,
 		UnsealQueue: unsealQueue,
@@ -44,7 +44,7 @@ func (u *Unsealer) Start() {
 				// Making sure there is a key available
 				fmt.Printf("Key %d is out of range", unsealRequest.KeyNumber)
 			}
-			status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.reset, u.params.migrate)
+			status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
             if err != nil {
                 fmt.Println("Error sending unseal call")
             }
