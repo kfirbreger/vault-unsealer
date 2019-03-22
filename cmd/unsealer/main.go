@@ -1,6 +1,8 @@
 package main
 
 import (
+    "fmt"
+
 	"github.com/kfirbreger/vault-unsealer/internal"
 )
 
@@ -9,6 +11,7 @@ import (
 func main() {
 	// Load config
 	conf := internal.LoadConfiguration()
+    fmt.Println(*conf)
 	// Update with command line arguments
 	// @TODO add command line arguments handling
 
@@ -37,7 +40,8 @@ func main() {
 		// Creating checkers
 		c := internal.NewChecker(i, checkerQueue, unsealQueue, logChan)
 		(*c).Start()
-		checkers[i] = c
+        fmt.Printf("Created %d checker\n", i)
+		checkers = append(checkers,  c)
 	}
 
 	// Creating unseal params
@@ -46,13 +50,16 @@ func main() {
 	for i := 0; i < conf.Workers.UnsealCount; i++ {
         u := internal.NewUnsealer(i, unsealQueue, logChan, up)
 		(*u).Start()
-		unsealers[i] = u
+        fmt.Printf("Created %d unsealer\n", i)
+		unsealers = append(unsealers,  u)
 	}
 
 	// Creating the Status check generators
-	for i := 0; i < len(conf.Servers); i++ {
+	for i := 0; i < len((*conf).Servers); i++ {
 		go internal.GenerateChecks(checkerQueue, conf.Servers[i].Domain, conf.Vault.Protocol, conf.Vault.StatusPath, conf.Vault.CheckInterval)
+        fmt.Printf("Created generator for %s\n", conf.Servers[i].Domain)
 	}
+    fmt.Println("Monitoring started")
 	// Just let the program do its work
 	for {
 	}
