@@ -1,14 +1,14 @@
 package internal
 
 import (
-    "bytes"
-    "bufio"
-    "flag"
+	"bufio"
+	"bytes"
+	"flag"
 	"fmt"
-    "os"
-    "strconv"
-    "strings"
 	"github.com/awnumar/memguard"
+	"os"
+	"strconv"
+	"strings"
 )
 
 func GetUnsealKeys() []*memguard.LockedBuffer {
@@ -42,7 +42,7 @@ func getKeyCount() int {
 func readKeys(keyCount int) []*memguard.LockedBuffer {
 	// Save the unsealing keys in a slice
 	// Need to move it to memguard so its safe in memory
-    keys := make([]*memguard.LockedBuffer, 0, keyCount)
+	keys := make([]*memguard.LockedBuffer, 0, keyCount)
 	reader := bufio.NewReader(os.Stdin)
 	for i := 1; i < keyCount+1; i++ {
 		fmt.Printf("Unsealing key %d: ", i)
@@ -50,9 +50,9 @@ func readKeys(keyCount int) []*memguard.LockedBuffer {
 		// convert CRLF to LF
 		text = bytes.TrimSpace(text)
 		membuf, err := memguard.NewImmutableFromBytes(text)
-        if err != nil {
-            fmt.Println("Eror creating memory safe storage")
-        }
+		if err != nil {
+			fmt.Println("Eror creating memory safe storage")
+		}
 		keys = append(keys, membuf)
 	}
 	return keys

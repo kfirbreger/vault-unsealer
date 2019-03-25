@@ -18,7 +18,7 @@ type Checker struct {
 	ManageChan       chan int
 	LogChan          chan<- string
 	CallsMade        int
-	CallsSuccessful   int
+	CallsSuccessful  int
 	UnsealRequests   int
 }
 
@@ -27,7 +27,7 @@ func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue ch
 	checker := Checker{
 		ID:               id,
 		StatusCheckQueue: statusCheckQueue,
-        UnsealQueue: unsealQueue,
+		UnsealQueue:      unsealQueue,
 		ManageChan:       make(chan int),
 		LogChan:          logChan,
 		CallsMade:        0,
@@ -43,12 +43,12 @@ func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue ch
 // without significant change code
 func ExecCheckOverHttp(url string) (int, error) {
 	// Makeing a call, returning the status code, or error code
-    resp, err := http.Get(url)
+	resp, err := http.Get(url)
 	// Debuging info
 	if err != nil {
 		fmt.Println("Error calling to Vault. is Vault sealed?")
 		fmt.Println(err)
-        return -1, err
+		return -1, err
 	}
 	fmt.Println("StatusCode: ", resp.StatusCode)
 	return resp.StatusCode, err
@@ -64,11 +64,11 @@ func (c *Checker) Start() {
 				fmt.Printf("worker %d: Received check request for url %s\n", c.ID, work.Url)
 
 				c.CallsMade++
-                StatusCode, err := ExecCheckOverHttp(work.Url)
+				StatusCode, err := ExecCheckOverHttp(work.Url)
 				// Checking vault status
 				if StatusCode == 503 { // TODO unseal conditions
 					c.UnsealRequests++
-                    c.UnsealQueue <- work.Domain
+					c.UnsealQueue <- work.Domain
 				} else if StatusCode > 199 && StatusCode < 300 && err == nil {
 					c.CallsSuccessful++
 				}

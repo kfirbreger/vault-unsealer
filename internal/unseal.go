@@ -1,17 +1,17 @@
 package internal
 
 import (
-    "bytes"
+	"bytes"
 	"fmt"
 	"net/http"
-	
-    "github.com/awnumar/memguard"
+
+	"github.com/awnumar/memguard"
 )
 
 const UNSEALCALLERROR = -1
 
 type Unsealparams struct {
-	Keys    []*memguard.LockedBuffer 
+	Keys    []*memguard.LockedBuffer
 	Reset   bool
 	Migrate bool
 }
@@ -44,12 +44,12 @@ func (u *Unsealer) Start() {
 				// Making sure there is a key available
 				fmt.Printf("Key %d is out of range", unsealRequest.KeyNumber)
 			}
-            fmt.Println("Unseal request recieved", u.params.Keys)
+			fmt.Println("Unseal request recieved", u.params.Keys)
 			status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
-            if err != nil {
-                fmt.Println("Error sending unseal call")
-            }
-            fmt.Printf("Unseal returned status code %d\n", status)
+			if err != nil {
+				fmt.Println("Error sending unseal call")
+			}
+			fmt.Printf("Unseal returned status code %d\n", status)
 		}
 	}()
 }
@@ -57,11 +57,11 @@ func (u *Unsealer) Start() {
 func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
 	// Perform an unseal request over http(s)
 	// Again key is passed as pointer to prevent leaking to gc
-	
-    // Creating a buffer with the key. This is unfortunaltely unavoidable
-    // TODO add reset and migrate options to the call
-    fmt.Println("Creating unseal request", key)
-    req, err := http.NewRequest("PUT", url, bytes.NewBuffer(append([]byte(`{"key":"`), append((*key).Buffer(), []byte(`"}`)...)...)))
+
+	// Creating a buffer with the key. This is unfortunaltely unavoidable
+	// TODO add reset and migrate options to the call
+	fmt.Println("Creating unseal request", key)
+	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(append([]byte(`{"key":"`), append((*key).Buffer(), []byte(`"}`)...)...)))
 
 	// Sending the request
 	client := &http.Client{}

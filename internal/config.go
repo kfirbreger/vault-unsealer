@@ -1,10 +1,10 @@
 package internal
 
 import (
-    "flag"
-    "fmt"
+	"flag"
+	"fmt"
 
-    "github.com/BurntSushi/toml"
+	"github.com/BurntSushi/toml"
 )
 
 type Instance struct {
@@ -12,10 +12,10 @@ type Instance struct {
 }
 
 type VaultConf struct {
-    Protocol       string 
+	Protocol       string
 	StatusPath     string `toml:"status_path"`
 	UnsealPath     string `toml:"unseal_path"`
-	UnsealKeyCount int `toml:"unseal_key_count"`
+	UnsealKeyCount int    `toml:"unseal_key_count"`
 	CheckInterval  int    `toml:"seal_check_interval"`
 }
 
@@ -28,14 +28,14 @@ type WorkersConf struct {
 type Service struct {
 	Vault   VaultConf
 	Workers WorkersConf
-    Servers []Instance `toml:"server"`
+	Servers []Instance `toml:"server"`
 }
 
 func Load(filepath string, s *Service) {
 	if _, err := toml.DecodeFile(filepath, s); err != nil {
-        fmt.Println(err)
-    }
-    fmt.Println(*s)
+		fmt.Println(err)
+	}
+	fmt.Println(*s)
 	// @todo add verification
 }
 
@@ -68,9 +68,8 @@ func updateConfig(serv *Service, params *CliParams) {
 }
 
 func LoadConfiguration() *Service {
-    var conf Service
-    Load("./config.toml", &conf)
-    // TODO add cli params
-    return &conf
+	var conf Service
+	Load("./config.toml", &conf)
+	// TODO add cli params
+	return &conf
 }
-
