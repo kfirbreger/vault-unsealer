@@ -21,7 +21,7 @@ func main() {
 	// be done via pointers to prevent gc from
 	// moving the keys around
 	keys := internal.GetUnsealKeys()
-
+    fmt.Println("keys: ", keys)
 	// Start the following:
 	// 1. Channels
 	// 2. Checker workers
@@ -29,7 +29,8 @@ func main() {
 	// 4. Status check generators
 	checkerQueue := make(chan internal.StatusCheckRequest, 10) // TODO make this service count * something
 	unsealQueue := make(chan internal.UnsealRequest, 20)       // TODO same here
-	logChan := make(chan string, 10)
+    unsealNeededQueue := make(chan string, 10)
+    logChan := make(chan string, 10)
 
 	// Creating Cehcker workers
     checkers := make([]*internal.Checker, 0, conf.Workers.StatusCheckCount)
@@ -38,7 +39,7 @@ func main() {
 
 	for i := 0; i < conf.Workers.StatusCheckCount; i++ {
 		// Creating checkers
-		c := internal.NewChecker(i, checkerQueue, unsealQueue, logChan)
+		c := internal.NewChecker(i, checkerQueue, unsealNeededQueue, logChan)
 		(*c).Start()
         fmt.Printf("Created %d checker\n", i)
 		checkers = append(checkers,  c)
@@ -59,6 +60,7 @@ func main() {
 		go internal.GenerateChecks(checkerQueue, conf.Servers[i].Domain, conf.Vault.Protocol, conf.Vault.StatusPath, conf.Vault.CheckInterval)
         fmt.Printf("Created generator for %s\n", conf.Servers[i].Domain)
 	}
+    go internal.GenerateUnseal(unsealNeededQueue, unsealQueue, conf.Vault.Protocol, conf.Vault.UnsealPath, len(keys))
     fmt.Println("Monitoring started")
 	// Just let the program do its work
 	for {
