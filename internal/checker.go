@@ -14,19 +14,20 @@ const STATUS = 5
 type Checker struct {
 	ID               int
 	StatusCheckQueue chan StatusCheckRequest
-	UnsealQueue      chan UnsealRequest
+	UnsealQueue      chan<- string
 	ManageChan       chan int
-	LogChan          <-chan string
+	LogChan          chan<- string
 	CallsMade        int
 	CallsSuccessful   int
 	UnsealRequests   int
 }
 
-func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue chan UnsealRequest, logChan chan string) *Checker {
+func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue chan string, logChan chan string) *Checker {
 	// Creating a new worker
 	checker := Checker{
 		ID:               id,
 		StatusCheckQueue: statusCheckQueue,
+        UnsealQueue: unsealQueue,
 		ManageChan:       make(chan int),
 		LogChan:          logChan,
 		CallsMade:        0,
@@ -67,7 +68,7 @@ func (c *Checker) Start() {
 				// Checking vault status
 				if StatusCode == 503 { // TODO unseal conditions
 					c.UnsealRequests++
-					// @TODO generate unseal work
+                    c.UnsealQueue <- work.Domain
 				} else if StatusCode > 199 && StatusCode < 300 && err == nil {
 					c.CallsSuccessful++
 				}
