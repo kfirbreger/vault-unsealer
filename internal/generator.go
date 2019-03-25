@@ -11,7 +11,7 @@ func GenerateChecks(statusCheck chan<- StatusCheckRequest, domain string, protoc
 	name := "Status check for " + domain
 	for {
 		// Creating work
-		work := StatusCheckRequest{Name: name, Url: url}
+        work := StatusCheckRequest{Name: name, Url: url, Domain: domain}
 		// Adding it to the work queue
 		statusCheck <- work
 		// Waiting before next call
@@ -19,14 +19,16 @@ func GenerateChecks(statusCheck chan<- StatusCheckRequest, domain string, protoc
 	}
 }
 
-func GenerateUnseal(unsealRequest chan<- UnsealRequest, domain string, protocol string, unsealPath string, unsealKeyCount int) {
-    url := protocol + "://" + domain + "/" + unsealPath
-	// Defining the other parameters
-	name := "Status check for " + domain
-	for i := 0; i < unsealKeyCount; i++ {
-		// Creating work
-		work := UnsealRequest{Name: name, Url: url}
-		// Adding it to the work queue
-		unsealRequest <- work
+func GenerateUnseal(unsealNeeded <-chan string, unsealRequest chan<- UnsealRequest, protocol string, unsealPath string, unsealKeyCount int) {
+    for domain := range unsealNeeded {
+        url := protocol + "://" + domain + "/" + unsealPath
+        // Defining the other parameters
+        name := "Status check for " + domain
+        for i := 0; i < unsealKeyCount; i++ {
+            // Creating work
+            work := UnsealRequest{Name: name, Url: url, KeyNumber: i}
+            // Adding it to the work queue
+            unsealRequest <- work
+        }
 	}
 }
