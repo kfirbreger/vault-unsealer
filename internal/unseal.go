@@ -4,8 +4,8 @@ import (
     "bytes"
 	"fmt"
 	"net/http"
-	"runtime"
-	"github.com/awnumar/memguard"
+	
+    "github.com/awnumar/memguard"
 )
 
 const UNSEALCALLERROR = -1
@@ -49,7 +49,7 @@ func (u *Unsealer) Start() {
             if err != nil {
                 fmt.Println("Error sending unseal call")
             }
-            fmt.Printf("Unseal returned status code %d", status)
+            fmt.Printf("Unseal returned status code %d\n", status)
 		}
 	}()
 }
@@ -71,6 +71,5 @@ func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migr
 	if err != nil {
 		return UNSEALCALLERROR, err
 	}
-	defer runtime.GC() // Manually triggering GC
 	return resp.StatusCode, err
 }

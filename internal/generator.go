@@ -1,15 +1,22 @@
 package internal
 
 import (
+    "fmt"
 	"time"
 )
+
+// After generating unseal calls, how long shall the generator pause
+// before looking for other unsealing calls
+const UNSEALSLEEP = 100
+
 
 func GenerateChecks(statusCheck chan<- StatusCheckRequest, domain string, protocol string, statusPath string, interval int) {
 	// Making a map with the params
 	url := protocol + "://" + domain + "/" + statusPath
 	// Defining the other parameters
-	name := "Status check for " + domain
+	name := "Status check for" + domain
 	for {
+        fmt.Println("Generating unseal request for ", domain)
 		// Creating work
         work := StatusCheckRequest{Name: name, Url: url, Domain: domain}
 		// Adding it to the work queue
@@ -30,5 +37,6 @@ func GenerateUnseal(unsealNeeded <-chan string, unsealRequest chan<- UnsealReque
             // Adding it to the work queue
             unsealRequest <- work
         }
+        time.Sleep(time.Duration(UNSEALSLEEP) * time.Millisecond)
 	}
 }
