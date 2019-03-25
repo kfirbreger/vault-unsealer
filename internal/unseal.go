@@ -44,6 +44,7 @@ func (u *Unsealer) Start() {
 				// Making sure there is a key available
 				fmt.Printf("Key %d is out of range", unsealRequest.KeyNumber)
 			}
+            fmt.Println("Unseal request recieved", u.params.Keys)
 			status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
             if err != nil {
                 fmt.Println("Error sending unseal call")
@@ -59,6 +60,7 @@ func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migr
 	
     // Creating a buffer with the key. This is unfortunaltely unavoidable
     // TODO add reset and migrate options to the call
+    fmt.Println("Creating unseal request", key)
     req, err := http.NewRequest("PUT", url, bytes.NewBuffer(append([]byte(`{"key":"`), append((*key).Buffer(), []byte(`"}`)...)...)))
 
 	// Sending the request
