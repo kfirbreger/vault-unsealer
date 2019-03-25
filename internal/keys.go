@@ -42,7 +42,7 @@ func getKeyCount() int {
 func readKeys(keyCount int) []*memguard.LockedBuffer {
 	// Save the unsealing keys in a slice
 	// Need to move it to memguard so its safe in memory
-    keys := make([]*memguard.LockedBuffer, keyCount)
+    keys := make([]*memguard.LockedBuffer, 0, keyCount)
 	reader := bufio.NewReader(os.Stdin)
 	for i := 1; i < keyCount+1; i++ {
 		fmt.Printf("Unsealing key %d: ", i)
