@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
     "log"
+    "os"
     "os/user"
     "path/filepath"
 
@@ -77,10 +78,13 @@ func LoadConfiguration() *Service {
     cliParams := getCliParams()
     // Reading the config file
     configFile := "./config.toml"
-    if cliParams.ConfigFile {
+    if len(cliParams.ConfigFile) > 0 {
         if _, err := os.Stat(cliParams.ConfigFile); err == nil {
             // There is a file with that name, so use it as a config file
-            configFile = expand(cliParams.ConfigFile)
+            // It is safe to reuse err as it is nil
+            if configFile, err = expand(cliParams.ConfigFile); err != nil {
+                log.Fatal(err)
+            }
         } else if os.IsNotExist(err) {
             log.Fatalf("The file %s does not seem to exist", cliParams.ConfigFile)
         } else {
