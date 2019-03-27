@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// Load config
-	conf := internal.LoadConfiguration()
+	conf := config.LoadConfiguration()
     fmt.Println(*conf)
 	// Update with command line arguments
 	// @TODO add command line arguments handling

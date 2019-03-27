@@ -31,7 +31,7 @@ func LoadConfiguration() *Service {
 
 	Load(configFile, &conf)
     // Update with the CLI params
-    updateConfig(conf, cliParams)
+    updateConfig(&conf, &cliParams)
 
 	return &conf
 }

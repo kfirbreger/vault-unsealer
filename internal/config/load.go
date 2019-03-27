@@ -1,12 +1,9 @@
 package config
 
 import (
-    "fmt"
     "log"
-    "os"
     "os/user"
     "path/filepath"
-    "strings"
 
     "github.com/BurntSushi/toml"
 )
@@ -37,9 +34,9 @@ type Service struct {
 
 func Load(filepath string, s *Service) {
 	if _, err := toml.DecodeFile(filepath, s); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
-	fmt.Println(*s)
+	log.Println(*s)
 	// @todo add verification
 }
 
