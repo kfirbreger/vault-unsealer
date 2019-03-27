@@ -3,11 +3,8 @@ package config
 import (
     "log"
     "os"
+    "strings"
 )
-// Updating config from CLI, if needed
-func updateConfig(serv *Service, params *CliParams) {
-	return
-}
 
 func LoadConfiguration() *Service {
 	var conf Service
@@ -31,8 +28,44 @@ func LoadConfiguration() *Service {
 
 	Load(configFile, &conf)
     // Update with the CLI params
-    updateConfig(&conf, &cliParams)
+    updateConfig(conf, cliParams)
 
 	return &conf
 }
 
+// Updating config from CLI, if needed
+func updateConfig(conf Service, params CliParams) Service {
+    // Checking the flags
+    if params.UnsealKeyCount > 0 {
+        conf.Vault.UnsealKeyCount = params.UnsealKeyCount
+    }
+
+    if params.Interval > 0 {
+        conf.Vault.CheckInterval = params.Interval
+    }
+   
+    // converting protocol to lowercase
+    prtcl := strings.ToLower(params.Protocol)
+    // and checking if its supported
+    if prtcl == "http" || prtcl == "https" {
+        conf.Vault.Protocol = params.Protocol
+    } else if len(params.Protocol) > 0 {
+        log.Printf("Unsupported protocol %s given on protocol flag. Using the one defined in the configuration file instead\n", params.Protocol)
+    }
+
+    // Checking that if reset instance is givem, at least one instance is also given
+    if params.ResetInstances {
+        if len(params.Instances) == 0 {
+            log.Fatal("An instance reset was passed with no new instances. Nothing to work with, terminating")
+        }
+        // Reseting the instance count
+        conf.Servers = make([]Instance, 0)
+    }
+
+    for i:= 0; i < len(params.Instances);i ++ {
+        inst := Instance{Domain: params.Instances[i]}
+        conf.Servers = append(conf.Servers, inst)
+    }
+
+    return conf
+}
