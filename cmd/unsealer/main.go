@@ -4,6 +4,7 @@ import (
     "fmt"
 
 	"github.com/kfirbreger/vault-unsealer/internal"
+	"github.com/kfirbreger/vault-unsealer/internal/config"
 )
 
 // GODEBUG=clobberfree=1
