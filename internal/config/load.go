@@ -1,11 +1,11 @@
 package config
 
 import (
-    "log"
-    "os/user"
-    "path/filepath"
+	"log"
+	"os/user"
+	"path/filepath"
 
-    "github.com/BurntSushi/toml"
+	"github.com/BurntSushi/toml"
 )
 
 type Instance struct {
@@ -30,6 +30,7 @@ type Service struct {
 	Vault   VaultConf
 	Workers WorkersConf
 	Servers []Instance `toml:"server"`
+	Keys    []string
 }
 
 func Load(filepath string, s *Service) {
@@ -37,21 +38,24 @@ func Load(filepath string, s *Service) {
 		log.Println(err)
 	}
 	log.Println(*s)
-	// @todo add verification
+	if len((*s).Keys) > 0 {
+		log.Fatal("No keys are allowed in the configuration file")
+	}
+	// @TODO add verification
 }
 
 func expand(path string) (string, error) {
-    /**
-    Expand the directory to be absolute instead of relative path
-    as using ~ will not always work when opening files
-    */
-    if len(path) == 0 || path[0] != '~' {
-        return path, nil
-    }
+	/**
+	  Expand the directory to be absolute instead of relative path
+	  as using ~ will not always work when opening files
+	*/
+	if len(path) == 0 || path[0] != '~' {
+		return path, nil
+	}
 
-    usr, err := user.Current()
-    if err != nil {
-        return "", err
-    }
-    return filepath.Join(usr.HomeDir, path[1:]), nil
+	usr, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(usr.HomeDir, path[1:]), nil
 }
