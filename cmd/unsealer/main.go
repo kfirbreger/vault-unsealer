@@ -1,7 +1,7 @@
 package main
 
 import (
-    "fmt"
+    "log"
 
 	"github.com/kfirbreger/vault-unsealer/internal"
 	"github.com/kfirbreger/vault-unsealer/internal/config"
@@ -12,7 +12,7 @@ import (
 func main() {
 	// Load config
 	conf := config.LoadConfiguration()
-    fmt.Println(*conf)
+    log.Println(*conf)
 	// Update with command line arguments
 	// @TODO add command line arguments handling
 
@@ -21,8 +21,8 @@ func main() {
 	// allowed to exist to all refrences will
 	// be done via pointers to prevent gc from
 	// moving the keys around
-	keys := internal.GetUnsealKeys()
-    fmt.Println("keys: ", keys)
+	keys := internal.GetUnsealKeys(conf.Vault.UnsealKeyCount)
+    log.Println("keys: ", keys)
 	// Start the following:
 	// 1. Channels
 	// 2. Checker workers
@@ -42,7 +42,7 @@ func main() {
 		// Creating checkers
 		c := internal.NewChecker(i, checkerQueue, unsealNeededQueue, logChan)
 		(*c).Start()
-        fmt.Printf("Created %d checker\n", i)
+        log.Printf("Created %d checker\n", i)
 		checkers = append(checkers,  c)
 	}
 
@@ -52,17 +52,17 @@ func main() {
 	for i := 0; i < conf.Workers.UnsealCount; i++ {
         u := internal.NewUnsealer(i, unsealQueue, logChan, up)
 		(*u).Start()
-        fmt.Printf("Created %d unsealer\n", i)
+        log.Printf("Created %d unsealer\n", i)
 		unsealers = append(unsealers,  u)
 	}
 
 	// Creating the Status check generators
 	for i := 0; i < len((*conf).Servers); i++ {
 		go internal.GenerateChecks(checkerQueue, conf.Servers[i].Domain, conf.Vault.Protocol, conf.Vault.StatusPath, conf.Vault.CheckInterval)
-        fmt.Printf("Created generator for %s\n", conf.Servers[i].Domain)
+        log.Printf("Created generator for %s\n", conf.Servers[i].Domain)
 	}
     go internal.GenerateUnseal(unsealNeededQueue, unsealQueue, conf.Vault.Protocol, conf.Vault.UnsealPath, len(keys))
-    fmt.Println("Monitoring started")
+    log.Println("Monitoring started")
 	// Just let the program do its work
 	for {
 	}
