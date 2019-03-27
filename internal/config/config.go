@@ -36,14 +36,17 @@ func LoadConfiguration() *Service {
 // Updating config from CLI, if needed
 func updateConfig(conf Service, params CliParams) Service {
     // Checking the flags
+
+    // -- Key Count --
     if params.UnsealKeyCount > 0 {
         conf.Vault.UnsealKeyCount = params.UnsealKeyCount
     }
-
+    // -- Check interval --
     if params.Interval > 0 {
         conf.Vault.CheckInterval = params.Interval
     }
-   
+  
+    // -- Protocol --
     // converting protocol to lowercase
     prtcl := strings.ToLower(params.Protocol)
     // and checking if its supported
@@ -53,6 +56,7 @@ func updateConfig(conf Service, params CliParams) Service {
         log.Printf("Unsupported protocol %s given on protocol flag. Using the one defined in the configuration file instead\n", params.Protocol)
     }
 
+    // -- Instances --
     // Checking that if reset instance is givem, at least one instance is also given
     if params.ResetInstances {
         if len(params.Instances) == 0 {
@@ -65,6 +69,14 @@ func updateConfig(conf Service, params CliParams) Service {
     for i:= 0; i < len(params.Instances);i ++ {
         inst := Instance{Domain: params.Instances[i]}
         conf.Servers = append(conf.Servers, inst)
+    }
+
+    // -- Pathing --
+    if len(params.StatusPath) > 0 {
+        conf.Vault.StatusPath = params.StatusPath // @TODO check its url legal
+    }
+    if len(params.UnsealPath) > 0 {
+        conf.Vault.UnsealPath = params.UnsealPath  // @TODO check its url legal
     }
 
     return conf
