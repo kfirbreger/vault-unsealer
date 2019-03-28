@@ -95,3 +95,20 @@ func updateConfig(conf Service, params CliParams) Service {
 
 	return conf
 }
+
+
+func expand(path string) (string, error) {
+	/**
+	  Expand the directory to be absolute instead of relative path
+	  as using ~ will not always work when opening files
+	*/
+	if len(path) == 0 || path[0] != '~' {
+		return path, nil
+	}
+
+	usr, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(usr.HomeDir, path[1:]), nil
+}
