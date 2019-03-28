@@ -1,4 +1,7 @@
-FROM golang:1.12 as build
+# Allow go version to be set at build
+ARG GO_VERSION=1.12
+
+FROM golang:{GO_VERSION} as build
 
 RUN apt-get update && \
     apt-get upgrade
