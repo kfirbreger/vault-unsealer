@@ -1,5 +1,10 @@
 FROM golang:1.12 as build
- 
+
+RUN apt-get update &&
+    apt-get upgrade
+   
+RUN apt-get install go-dep
+
 WORKDIR /go/src/app
 COPY . .
  
