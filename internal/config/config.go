@@ -1,6 +1,7 @@
 package config
 
 import (
+    "bufio"
 	"log"
 	"os"
 	"strings"
@@ -90,10 +91,39 @@ func updateConfig(conf Service, params CliParams) Service {
 
 	if len(params.KeyFile) > 0 {
 		// Read the keys of the file. Each line represents a key
-		log.Fatal("Not implemented yet")
+        filePath := expand(params.KeyFile) // Supporting ~ in path
+        if conf.Keys = loadKeyFile(filePath); err != nil {
+            log.Fatalf("Failed to load keys from file %s\n", params.KeyFile)
+        }
 	}
 
 	return conf
+}
+
+
+func loadKeyFile(filePath string) []string {
+    // Open the file and put all the keys in a slice
+    // Each line in the file is expected to be a key
+    if file, err := os.Open(filePath); err != nil {
+        log.Fatalf("Failed to open %s: %s", filePath, err)
+    }
+    defer file.Close()
+    
+    keys := make([]string, 0)
+    
+    // Reading the file
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        // Adding key after whitespace cleaning
+        keys = append(keys, string.TrimSpace(scanner.Text()))
+    }
+    
+    // Checking no errors were raized during reading
+    if err := scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+    
+    return keys
 }
 
 
@@ -112,3 +142,4 @@ func expand(path string) (string, error) {
 	}
 	return filepath.Join(usr.HomeDir, path[1:]), nil
 }
+
