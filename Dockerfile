@@ -1,4 +1,4 @@
-FROM golang:1.12
+FROM golang:1.12 as build
  
 WORKDIR /go/src/app
 COPY . .
@@ -9,6 +9,6 @@ RUN GOOS=linux go build cmd/unsealer/main.go
 FROM alpine:latest  
 RUN apk --no-cache add ca-certificates
 WORKDIR /app
-COPY --from=0 /go/src/app/cmd/unsealer/unsealer .
+COPY --from=build /go/src/app/cmd/unsealer/unsealer .
 CMD ["./unsealer"]  
  
