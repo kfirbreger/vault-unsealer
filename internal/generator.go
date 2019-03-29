@@ -29,7 +29,7 @@ func GenerateUnseal(unsealNeeded <-chan string, unsealRequest chan<- UnsealReque
 	for domain := range unsealNeeded {
 		url := protocol + "://" + domain + "/" + unsealPath
 		// Defining the other parameters
-		name := "Status check for " + domain
+		name := "Unseal request for " + domain
 		for i := 0; i < unsealKeyCount; i++ {
 			// Creating work
 			work := UnsealRequest{Name: name, Url: url, KeyNumber: i}
