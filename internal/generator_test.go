@@ -30,7 +30,7 @@ func TestStatusCheckInterval(t *testing.T) {
     domain := "localhost:1234"
     protocol := "https"
     stsPth := "1/2/3"
-    interval := 100
+    interval := 370
     
     go GenerateChecks(sc, domain, protocol, stsPth, interval)
     // Waiting for a message
@@ -39,8 +39,10 @@ func TestStatusCheckInterval(t *testing.T) {
     
     msg <- sc
     endTime := timestamp()
-    
-    if (endTime - startTime - interval) < ALLOWEDTIMEDIFFERENCETHRESHOLD
+    delta := endTime - startTime - interval
+    if delta < -ALLOWEDTIMEDIFFERENCETHRESHOLD || ALLOWEDTIMEDIFFERENCETHRESHOLD < delta {
+        t.Errorf("Time interval is used correctly. Expeted ~%d but instead got %d", interval, delta)
+    }
 }
 
 func timestamp() int64 {
