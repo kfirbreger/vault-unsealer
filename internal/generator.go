@@ -16,7 +16,7 @@ func GenerateChecks(statusCheck chan<- StatusCheckRequest, domain string, protoc
 	// Defining the other parameters
 	name := "Status check for" + domain
 	for {
-		fmt.Println("Generating unseal request for ", domain)
+		fmt.Println("Checking status of", domain)
 		// Creating work
 		work := StatusCheckRequest{Name: name, Url: url, Domain: domain}
 		// Adding it to the work queue
@@ -31,7 +31,7 @@ func GenerateUnseal(unsealNeeded <-chan string, unsealRequest chan<- UnsealReque
 		url := protocol + "://" + domain + "/" + unsealPath
 		// Defining the other parameters
 		for i := 0; i < unsealKeyCount; i++ {
-            name := "Unseal request for " + domain + " with key " + strcov.Itoa(i)
+            name := "Unseal request for " + domain + " with key " + strconv.Itoa(i)
 			// Creating work
 			work := UnsealRequest{Name: name, Url: url, KeyNumber: i}
 			// Adding it to the work queue
