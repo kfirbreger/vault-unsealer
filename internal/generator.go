@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"time"
+    "strconv"
 )
 
 // After generating unseal calls, how long shall the generator pause
@@ -29,8 +30,8 @@ func GenerateUnseal(unsealNeeded <-chan string, unsealRequest chan<- UnsealReque
 	for domain := range unsealNeeded {
 		url := protocol + "://" + domain + "/" + unsealPath
 		// Defining the other parameters
-		name := "Unseal request for " + domain
 		for i := 0; i < unsealKeyCount; i++ {
+            name := "Unseal request for " + domain + " with key " + strcov.Itoa(i)
 			// Creating work
 			work := UnsealRequest{Name: name, Url: url, KeyNumber: i}
 			// Adding it to the work queue
