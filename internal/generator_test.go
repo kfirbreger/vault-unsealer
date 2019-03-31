@@ -18,13 +18,17 @@ func TestUrlCreatedCorrectly(t *testing.T) {
     interval := 1000
    
     expectedUrl := protocol + "://" + domain + "/" + stsPth
-    go GenerateChecks(sc, domain, protocol, stsPth, interval)
+    qc := make(chan bool)
+
+    go GenerateChecks(sc, qc, domain, protocol, stsPth, interval)
+    
     // Waiting for a message
     msg := <- sc
     
     if msg.Url != expectedUrl {
         t.Errorf("Expected url to be \"https://localhost:1234/1/2/3\" but got %s instead\n", msg.Url)
     }
+    qc <- true
 }
 
 func TestStatusCheckInterval(t *testing.T) {
@@ -34,7 +38,9 @@ func TestStatusCheckInterval(t *testing.T) {
     stsPth := "1/2/3"
     interval := 370
     
-    go GenerateChecks(sc, domain, protocol, stsPth, interval)
+    qc := make(chan bool)
+
+    go GenerateChecks(sc, qc, domain, protocol, stsPth, interval)
     // Waiting for a message
     _ = <- sc
     startTime := timestamp()
@@ -45,6 +51,7 @@ func TestStatusCheckInterval(t *testing.T) {
     if delta < -ALLOWEDTIMEDIFFERENCETHRESHOLD || ALLOWEDTIMEDIFFERENCETHRESHOLD < delta {
         t.Errorf("Time interval is used correctly. Expeted ~%d but instead got %d", interval, delta)
     }
+    qc <- true
 }
 
 func TestCreateUnsealRequestPerKey(t *testing.T) {
@@ -56,7 +63,9 @@ func TestCreateUnsealRequestPerKey(t *testing.T) {
 
     domain := "domain.local"
 
-    go GenerateUnseal(un, ur, protocol, unsealPath, unsealKeyCount)
+    qc := make(chan bool)
+
+    go GenerateUnseal(un, qc, ur, protocol, unsealPath, unsealKeyCount)
     
     expectedUrl := protocol + "://" + domain + "/" + unsealPath
 
@@ -72,12 +81,13 @@ func TestCreateUnsealRequestPerKey(t *testing.T) {
         if req.KeyNumber != requestCounter {
             t.Errorf("Key number in the request should be %d, but instead is %d", requestCounter, req.KeyNumber)
         }
-
         requestCounter++
     }
+    fmt.Println("Out of listening loop")
     if requestCounter != unsealKeyCount {
         t.Errorf("There should have been %d calls created but instead %d was created", unsealKeyCount, requestCounter)
     }
+    qc <- true
 }
 
 func timestamp() int64 {
