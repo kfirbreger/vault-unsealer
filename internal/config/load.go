@@ -35,10 +35,9 @@ func Load(filepath string, s *Service) {
 	if _, err := toml.DecodeFile(filepath, s); err != nil {
 		log.Fatal(err)
 	}
-    log.Println("Configuration: ", *s)
+	log.Println("Configuration: ", *s)
 	if len((*s).Keys) > 0 {
 		log.Fatal("No keys are allowed in the configuration file")
 	}
 	// @TODO add verification
 }
-

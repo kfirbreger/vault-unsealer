@@ -1,11 +1,11 @@
 package config
 
 import (
-    "bufio"
+	"bufio"
 	"log"
-    "path/filepath"
 	"os"
-    "os/user"
+	"os/user"
+	"path/filepath"
 	"strings"
 )
 
@@ -92,45 +92,43 @@ func updateConfig(conf Service, params CliParams) Service {
 	}
 
 	if len(params.KeyFile) > 0 {
-        var err error
+		var err error
 		// Read the keys of the file. Each line represents a key
-        filePath, _ := expand(params.KeyFile) // Supporting ~ in path
-        if conf.Keys, err = loadKeyFile(filePath); err != nil {
-            log.Fatalf("Failed to load keys from file %s\n", params.KeyFile)
-        }
+		filePath, _ := expand(params.KeyFile) // Supporting ~ in path
+		if conf.Keys, err = loadKeyFile(filePath); err != nil {
+			log.Fatalf("Failed to load keys from file %s\n", params.KeyFile)
+		}
 	}
 
 	return conf
 }
 
-
 func loadKeyFile(filePath string) ([]string, error) {
-    // Open the file and put all the keys in a slice
-    // Each line in the file is expected to be a key
-    file, err := os.Open(filePath)
-    if err != nil {
-        log.Fatalf("Failed to open %s: %s", filePath, err)
-        return nil, err
-    }
-    defer file.Close()
-    
-    keys := make([]string, 0)
-    
-    // Reading the file
-    scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-        // Adding key after whitespace cleaning
-        keys = append(keys, strings.TrimSpace(scanner.Text()))
-    }
-    
-    // Checking no errors were raized during reading
-    if err := scanner.Err(); err != nil {
-        log.Fatal(err)
-    }
-    
-    return keys, err
-}
+	// Open the file and put all the keys in a slice
+	// Each line in the file is expected to be a key
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatalf("Failed to open %s: %s", filePath, err)
+		return nil, err
+	}
+	defer file.Close()
 
+	keys := make([]string, 0)
+
+	// Reading the file
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		// Adding key after whitespace cleaning
+		keys = append(keys, strings.TrimSpace(scanner.Text()))
+	}
+
+	// Checking no errors were raized during reading
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return keys, err
+}
 
 func expand(path string) (string, error) {
 	/**
@@ -147,4 +145,3 @@ func expand(path string) (string, error) {
 	}
 	return filepath.Join(usr.HomeDir, path[1:]), nil
 }
-
