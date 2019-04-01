@@ -56,6 +56,7 @@ func TestStatusCheckInterval(t *testing.T) {
 
 func TestCreateUnsealRequestPerKey(t *testing.T) {
     un := make(chan string, 10)
+    qc := make(chan bool)
     ur := make(chan UnsealRequest, 10)
     protocol := "https"
     unsealPath := "sys/path/to/unseal"
@@ -63,25 +64,39 @@ func TestCreateUnsealRequestPerKey(t *testing.T) {
 
     domain := "domain.local"
 
-    qc := make(chan bool)
 
     go GenerateUnseal(un, qc, ur, protocol, unsealPath, unsealKeyCount)
     
     expectedUrl := protocol + "://" + domain + "/" + unsealPath
+    maxTimeBetweenMessages := int64(200)
 
     // Sending an unseal request
     un <- domain
-
+    
     requestCounter := 0
-    for req := range ur {
-        fmt.Println(req)
-        if req.Url != expectedUrl {
-            t.Errorf("Expecteing an unseal request for %s, but instead got one for %s", req.Url, expectedUrl)
+    startTime := timestamp()
+    endTime := int64(0)
+
+    // Labels are awesome
+    testCounter:
+    for {
+        select {
+        case req := <- ur:
+            startTime = timestamp()
+            fmt.Println(req)
+            if req.Url != expectedUrl {
+                t.Errorf("Expecteing an unseal request for %s, but instead got one for %s", req.Url, expectedUrl)
+            }
+            if req.KeyNumber != requestCounter {
+                t.Errorf("Key number in the request should be %d, but instead is %d", requestCounter, req.KeyNumber)
+            }
+            requestCounter++
+        default:
+            endTime = timestamp()
+            if (endTime - startTime) > maxTimeBetweenMessages {
+                break testCounter
+            }
         }
-        if req.KeyNumber != requestCounter {
-            t.Errorf("Key number in the request should be %d, but instead is %d", requestCounter, req.KeyNumber)
-        }
-        requestCounter++
     }
     fmt.Println("Out of listening loop")
     if requestCounter != unsealKeyCount {
