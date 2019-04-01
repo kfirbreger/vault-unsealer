@@ -3,7 +3,9 @@ package config
 import (
     "bufio"
 	"log"
+    "path/filepath"
 	"os"
+    "os/user"
 	"strings"
 )
 
@@ -90,9 +92,10 @@ func updateConfig(conf Service, params CliParams) Service {
 	}
 
 	if len(params.KeyFile) > 0 {
+        var err error
 		// Read the keys of the file. Each line represents a key
-        filePath := expand(params.KeyFile) // Supporting ~ in path
-        if conf.Keys = loadKeyFile(filePath); err != nil {
+        filePath, _ := expand(params.KeyFile) // Supporting ~ in path
+        if conf.Keys, err = loadKeyFile(filePath); err != nil {
             log.Fatalf("Failed to load keys from file %s\n", params.KeyFile)
         }
 	}
@@ -101,11 +104,13 @@ func updateConfig(conf Service, params CliParams) Service {
 }
 
 
-func loadKeyFile(filePath string) []string {
+func loadKeyFile(filePath string) ([]string, error) {
     // Open the file and put all the keys in a slice
     // Each line in the file is expected to be a key
-    if file, err := os.Open(filePath); err != nil {
+    file, err := os.Open(filePath)
+    if err != nil {
         log.Fatalf("Failed to open %s: %s", filePath, err)
+        return nil, err
     }
     defer file.Close()
     
@@ -115,7 +120,7 @@ func loadKeyFile(filePath string) []string {
     scanner := bufio.NewScanner(file)
     for scanner.Scan() {
         // Adding key after whitespace cleaning
-        keys = append(keys, string.TrimSpace(scanner.Text()))
+        keys = append(keys, strings.TrimSpace(scanner.Text()))
     }
     
     // Checking no errors were raized during reading
@@ -123,7 +128,7 @@ func loadKeyFile(filePath string) []string {
         log.Fatal(err)
     }
     
-    return keys
+    return keys, err
 }
 
 

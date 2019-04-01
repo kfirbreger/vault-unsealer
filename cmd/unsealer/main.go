@@ -32,6 +32,7 @@ func main() {
 	unsealQueue := make(chan internal.UnsealRequest, 20)       // TODO same here
 	unsealNeededQueue := make(chan string, 10)
 	logChan := make(chan string, 10)
+    quitChan := make(chan bool, 10)
 
 	// Creating Cehcker workers
 	checkers := make([]*internal.Checker, 0, conf.Workers.StatusCheckCount)
@@ -58,10 +59,10 @@ func main() {
 
 	// Creating the Status check generators
 	for i := 0; i < len((*conf).Servers); i++ {
-		go internal.GenerateChecks(checkerQueue, conf.Servers[i].Domain, conf.Vault.Protocol, conf.Vault.StatusPath, conf.Vault.CheckInterval)
+		go internal.GenerateChecks(checkerQueue, quitChan, conf.Servers[i].Domain, conf.Vault.Protocol, conf.Vault.StatusPath, conf.Vault.CheckInterval)
 		log.Printf("Created generator for %s\n", conf.Servers[i].Domain)
 	}
-	go internal.GenerateUnseal(unsealNeededQueue, unsealQueue, conf.Vault.Protocol, conf.Vault.UnsealPath, len(keys))
+	go internal.GenerateUnseal(unsealNeededQueue, quitChan, unsealQueue, conf.Vault.Protocol, conf.Vault.UnsealPath, len(keys))
 	log.Println("Monitoring started")
 	// Just let the program do its work
 	for {
