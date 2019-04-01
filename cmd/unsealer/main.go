@@ -32,7 +32,7 @@ func main() {
 	unsealQueue := make(chan internal.UnsealRequest, 20)       // TODO same here
 	unsealNeededQueue := make(chan string, 10)
 	logChan := make(chan string, 10)
-    quitChan := make(chan bool, 10)
+	quitChan := make(chan bool, 10)
 
 	// Creating Cehcker workers
 	checkers := make([]*internal.Checker, 0, conf.Workers.StatusCheckCount)
