@@ -12,7 +12,7 @@ import (
 
 func GetUnsealKeys(keyCount int, configKeys []string) []*memguard.LockedBuffer {
 	// Save the unsealing keys in a slice
-	keys := make([]*memguard.LockedBuffer, 0)
+	keys := make([]*memguard.LockedBuffer, 0, keyCount)
 	readKeys := true
 	// Checking if keys are given through config
 	// and if they are, skip reading from user
