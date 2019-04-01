@@ -21,19 +21,23 @@ func GetUnsealKeys(keyCount int, configKeys []string) []*memguard.LockedBuffer {
 	}
 	reader := bufio.NewReader(os.Stdin)
 	var singleKey = make([]byte, 0)
-
+    var err error
 	for i := 0; i < keyCount; i++ {
 		if readKeys {
-			fmt.Printf("Unsealing key %d: ", i)
-			singleKey, _ = reader.ReadBytes('\n')
+			fmt.Printf("Unsealing key %d: \n", i)
+            singleKey, err = reader.ReadBytes('\n')
+            if err != nil {
+                fmt.Println(err)
+            }
 		} else {
 			singleKey = []byte(configKeys[i])
 		}
 		// convert CRLF to LF
 		singleKey = bytes.TrimSpace(singleKey)
+        fmt.Println(singleKey)
 		membuf, err := memguard.NewImmutableFromBytes(singleKey)
 		if err != nil {
-			log.Fatal("Eror creating memory safe storage")
+			log.Fatal("Eror creating memory safe storage", err)
 		}
 		keys = append(keys, membuf)
 	}
