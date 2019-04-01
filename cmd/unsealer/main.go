@@ -22,7 +22,6 @@ func main() {
 	// be done via pointers to prevent gc from
 	// moving the keys around
 	keys := internal.GetUnsealKeys(conf.Vault.UnsealKeyCount, conf.Keys)
-	log.Println("keys: ", keys)
 	// Start the following:
 	// 1. Channels
 	// 2. Checker workers
