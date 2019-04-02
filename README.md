@@ -1,6 +1,15 @@
 # Vault unsealer
 
-Providing vault auto-unsealing when cloud infra is not available
+Since version 1.0 Vault offers auto nsealing functionality out of the box. For that it uses a public cloud infrastrcture(such as AWS, Azure and Gcloud), to securly store the vault master key.
+if tou can leverage those services, that should definitly be the way to go. However, there are times in which such services cannot be used(closed networks i.e.). On such systems
+Vault currently offers no tools to suport automatic unsealing. This project is meant to support auto unsealing while being as secure as possible.
+
+## Target Arcitecture
+
+The unsealer has been developed with kubernetes in mind. That does not mean that it cannot work on other arcitectures, just that the focus has been on running the unsealer
+as pods on kubernetes. Further, there is the intention to provide support for kubernetes API integration so that if Vault is also running on kubernetes (which Hashicorp currently
+[discourages](https://learn.hashicorp.com/vault/operations/production-hardening.html)), the unsealer will listen to the kubernetes API to determine if a vault pod has been
+restarted.
 
 ## Installation
 
@@ -25,7 +34,19 @@ currently a config file is still required.
 
 Passing the keys via a file or via a cli flag, though supported is only meant for development. __Do not used this in production!__
 
+
+## Deployment
+
+When moving to production it is recommended to have several unsealer containers running each with insufficent unsealing keys. If one
+container is compromised, there is still not enough information to do a seal / unseal operation on the vault. Also it can give robustness
+so that even if one unsealer container fails, there are enough running with sufficent unsealing keys to still support auto unsealing.
+
 ## Development
+
+Future improvments plans:
+- Support the kubernetes API to see if a vault pod has been restarted instead of using http(s) calls
+- Using a different vault for keeping the unsealing keys.
+- Good logging and monitoring options
 
 If you wish to contribute to the project here are some tips
 
