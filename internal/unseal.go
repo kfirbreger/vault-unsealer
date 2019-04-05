@@ -57,35 +57,34 @@ func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migr
 
 func (u *Unsealer) Start() {
 	go func() {
-        for {
-            select {
-            case unsealRequest := <-u.UnsealQueue:
-                // Performing the unsealing request
-                if unsealRequest.KeyNumber >= len(u.params.Keys) { // Sanity check
-                    // Making sure there is a key available
-                    log.Printf("Key %d is out of range\n", unsealRequest.KeyNumber)
-                }
-                log.Println("Unseal request recieved", u.params.Keys)
-                status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
-                if err != nil {
-                    log.Println("Error sending unseal call")
-                }
-                log.Printf("Unseal returned status code %d\n", status)
-            
-            case cmd := <-u.ManageChan:
-                switch cmd {
-                case STOP:
-                    log.Printf("Stopping unsealer %d", u.ID)
-                    return
-                default:
-                    log.Printf("Unsealer %d got unknown command %d\n", u.ID, cmd)
-                }
-            }
+		for {
+			select {
+			case unsealRequest := <-u.UnsealQueue:
+				// Performing the unsealing request
+				if unsealRequest.KeyNumber >= len(u.params.Keys) { // Sanity check
+					// Making sure there is a key available
+					log.Printf("Key %d is out of range\n", unsealRequest.KeyNumber)
+				}
+				log.Println("Unseal request recieved", u.params.Keys)
+				status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
+				if err != nil {
+					log.Println("Error sending unseal call")
+				}
+				log.Printf("Unseal returned status code %d\n", status)
+
+			case cmd := <-u.ManageChan:
+				switch cmd {
+				case STOP:
+					log.Printf("Stopping unsealer %d", u.ID)
+					return
+				default:
+					log.Printf("Unsealer %d got unknown command %d\n", u.ID, cmd)
+				}
+			}
 		}
 	}()
 }
 
 func (u *Unsealer) Stop() {
-    u.ManageChan <- STOP
+	u.ManageChan <- STOP
 }
-
