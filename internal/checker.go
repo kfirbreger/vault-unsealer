@@ -6,7 +6,7 @@ import (
 )
 
 // Constanses for the manage channel
-const QUIT = -1
+const STOP = 1
 const CONTINUE = 2
 const PAUZE = 3
 const STATUS = 5
@@ -76,7 +76,7 @@ func (c *Checker) Start() {
 			case cmd := <-c.ManageChan:
 				fmt.Printf("Command recieved: %d", cmd)
 				switch cmd {
-				case QUIT:
+				case STOP:
 					fmt.Printf("Worker %d quitting", c.ID)
 					return
 
@@ -93,5 +93,5 @@ func (c *Checker) Start() {
 
 // Adding worker stop function
 func (c *Checker) Stop() {
-	c.ManageChan <- QUIT
+	c.ManageChan <- STOP
 }
