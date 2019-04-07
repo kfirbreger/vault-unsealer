@@ -43,15 +43,14 @@ func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migr
 	// TODO add reset and migrate options to the call
 	log.Println("Creating unseal request", key)
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(append([]byte(`{"key":"`), append((*key).Buffer(), []byte(`"}`)...)...)))
-
 	// Sending the request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	// Making sure body is closed
-	defer resp.Body.Close()
 	if err != nil {
 		return UNSEALCALLERROR, err
-	}
+	} 
+    defer resp.Body.Close()
 	return resp.StatusCode, err
 }
 
