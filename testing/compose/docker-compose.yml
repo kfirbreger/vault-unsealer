@@ -1,0 +1,32 @@
+version: '3'
+services:
+  consul:
+    image: consul
+    command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=2
+    ports:
+      - "8500"
+      - "8600"
+      - "8301"
+      - "8302"
+    networks:
+      - safe
+    volumes:
+      - ./etc/consul.server/config:./consul-config.json
+    deploy:
+      replicas: 3
+
+  vault:
+    image: vault
+    command: server
+    depends_on:
+      - consul
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - safe
+    volumes:
+      - ./etc/vault.server/config:vault-config.json
+
+networks:
+  safe:
+

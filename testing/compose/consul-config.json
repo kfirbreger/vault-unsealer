@@ -1,0 +1,8 @@
+{
+  "datacenter": "kpn",
+  "log_level": "DEBUG",
+  "server": true,
+  "ui" : true,
+  "retry_join ": ["compose_consul_1", "compose_consul_2", "compose_consul_3"]
+}
+
