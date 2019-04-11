@@ -1,31 +1,45 @@
 version: '3'
 services:
-  consul:
+  consul-0:
     image: consul
-    command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=2
+    command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=2 -config-file=/etc/consul.json -retry-join=consul-1
     ports:
-      - "8500"
-      - "8600"
+      - "8300"
       - "8301"
       - "8302"
+      - "8500"
+      - "8600"
     networks:
       - safe
     volumes:
-      - ./etc/consul.server/config:./consul-config.json
-    deploy:
-      replicas: 3
+      - ./consul-config.json:/etc/consul.json
+  consul-1:
+    image: consul
+    command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=2 -config-file=/etc/consul.json -retry-join=consul-0
+    ports:
+      - "8300"
+      - "8301"
+      - "8302"
+      - "8500"
+      - "8600"
+    networks:
+      - safe
+    volumes:
+      - ./consul-config.json:/etc/consul.json
+
 
   vault:
     image: vault
     command: server
     depends_on:
-      - consul
+      - consul-0
+      - consul-1
     cap_add:
       - IPC_LOCK
     networks:
       - safe
     volumes:
-      - ./etc/vault.server/config:vault-config.json
+      - ./vault-ccnfig.json:/etc/vault.json
 
 networks:
   safe:
