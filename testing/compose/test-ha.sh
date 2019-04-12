@@ -1,18 +1,17 @@
 #!/bin/sh
 
 # Creating a network
-docker network create safe
+docker network create -d bridge safe
 
 # Starting the containers
-docker-compose up -d --project-name unsealer
-
+docker-compose --project-name unsealer up -d --force-recreate
 # Initiating vault
-docker-compose exec vault-0 vault operator init | grep "Unseal Key" | awk '{print $4}' > keys.txt
+docker exec unsealer_vault-0_1 vault operator init | grep "Unseal Key" | awk '{print $4}' > keys.txt
 
 # Starting the unsealer
 # This should lead to the vaults being unsealed
-docker build . --name unsealer
-docker run --rmi unsealer
+docker build ../../ --tag unsealer
+docker run --rmi unsealer --network=safe
 
 
 # Cleaning up

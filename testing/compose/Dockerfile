@@ -22,8 +22,8 @@ WORKDIR /app
 COPY --from=build /go/src/github.com/kfirbreger/vault-unsealer/unsealer .
 
 # Copying keys and config
-COPY keys.txt /app/keys.txt
-COPY config.toml /app/config.toml
+COPY testing/compose/keys.txt /app/keys.txt
+COPY testing/compose/config.toml /app/config.toml
 
 CMD ["./unsealer", "-key-file", "keys.txt"]  
  
