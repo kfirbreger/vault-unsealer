@@ -3,7 +3,6 @@ package internal
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"log"
 	"os"
 
