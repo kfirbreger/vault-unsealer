@@ -14,11 +14,11 @@ func LoadConfiguration() *Service {
 	cliParams := getCliParams()
 	// Reading the config file
 	configFile := "./config.toml"
-	if len(cliParams.ConfigFile) > 0 {
-		if _, err := os.Stat(cliParams.ConfigFile); err == nil {
+	if len(*(cliParams.ConfigFile)) > 0 {
+		if _, err := os.Stat(*(cliParams.ConfigFile)); err == nil {
 			// There is a file with that name, so use it as a config file
 			// It is safe to reuse err as it is nil
-			if configFile, err = expand(cliParams.ConfigFile); err != nil {
+			if configFile, err = expand(*(cliParams.ConfigFile)); err != nil {
 				log.Fatal(err)
 			}
 		} else if os.IsNotExist(err) {
@@ -41,7 +41,7 @@ func updateConfig(conf Service, params CliParams) Service {
 	// Checking the flags
 
 	// -- Key Count --
-	if params.UnsealKeyCount > 0 {
+	if *(params.UnsealKeyCount) > 0 {
 		conf.Vault.UnsealKeyCount = params.UnsealKeyCount
 	}
 	// -- Check interval --
@@ -90,12 +90,13 @@ func updateConfig(conf Service, params CliParams) Service {
 		}
 		conf.Keys = params.Keys[:]
 	}
-
+    log.Println("KeyFile:", params.KeyFile)
 	if len(params.KeyFile) > 0 {
 		var err error
 		// Read the keys of the file. Each line represents a key
 		filePath, _ := expand(params.KeyFile) // Supporting ~ in path
-		if conf.Keys, err = loadKeyFile(filePath); err != nil {
+		conf.Keys, err = loadKeyFile(filePath)
+        if err != nil {
 			log.Fatalf("Failed to load keys from file %s\n", params.KeyFile)
 		}
 	}
@@ -126,7 +127,7 @@ func loadKeyFile(filePath string) ([]string, error) {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-
+    log.Println("Keys loaded:", keys)
 	return keys, err
 }
 
