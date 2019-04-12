@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -43,14 +43,18 @@ func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue ch
 // without significant change code
 func ExecCheckOverHttp(url string) (int, error) {
 	// Makeing a call, returning the status code, or error code
-	resp, err := http.Get(url)
+    timeout := time.Duration(200 * time.Millisecond)
+    client := http.Client{
+        Timeout: timeout,
+    }
+    resp, err := client.Get(url)
 	// Debuging info
 	if err != nil {
-		fmt.Println("Error calling to Vault. is Vault sealed?")
-		fmt.Println(err)
+		log.Println("Error calling to Vault. is Vault sealed?")
+		log.Println(err)
 		return -1, err
 	}
-	fmt.Println("StatusCode: ", resp.StatusCode)
+	log.Println("StatusCode: ", resp.StatusCode)
 	return resp.StatusCode, err
 }
 
