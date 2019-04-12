@@ -1,46 +1,65 @@
 version: '3'
 services:
   consul-0:
-    image: consul
-    command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=2 -config-file=/etc/consul.json -retry-join=consul-1
+    image: consul:latest
+    command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=2 -config-file=/etc/consul.hcl -retry-join=consul-1
     ports:
       - "8300"
       - "8301"
       - "8302"
       - "8500"
       - "8600"
-    networks:
-      - safe
     volumes:
-      - ./consul-config.json:/etc/consul.json
+      - ./consul-config.hcl:/etc/consul.hcl
   consul-1:
     image: consul
-    command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=2 -config-file=/etc/consul.json -retry-join=consul-0
+    command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=2 -config-file=/etc/consul.hcl -retry-join=consul-0
     ports:
       - "8300"
       - "8301"
       - "8302"
       - "8500"
       - "8600"
-    networks:
-      - safe
     volumes:
-      - ./consul-config.json:/etc/consul.json
+      - ./consul-config.hcl:/etc/consul.hcl
 
 
-  vault:
-    image: vault
-    command: server
+  vault-0:
+    image: vault:latest
+    command: server -config /etc/vault.hcl
+    environment:
+      - VAULT_ADDR=http://127.0.0.1:8200
+      - VAULT_API_ADDR=http://vault-0:8200
+      - CLUSTER_ADDR=http://vault-0.8201
     depends_on:
       - consul-0
       - consul-1
     cap_add:
       - IPC_LOCK
-    networks:
-      - safe
+    ports:
+      - "8200"
+      - "8201"
     volumes:
-      - ./vault-ccnfig.json:/etc/vault.json
+      - ./vault-config.hcl:/etc/vault.hcl
+
+  vault-1:
+    image: vault:latest
+    command: server -config /etc/vault.hcl
+    environment:
+      - VAULT_ADDR=http://127.0.0.1:8200
+      - VAULT_API_ADDR=http://vault-0:8200
+      - CLUSTER_ADDR=http://vault-0.8201
+    depends_on:
+      - consul-0
+      - consul-1
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "8200"
+    volumes:
+      - ./vault-config.hcl:/etc/vault.hcl
 
 networks:
-  safe:
-
+  default:
+    external:
+      name: safe
