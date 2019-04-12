@@ -41,27 +41,27 @@ func updateConfig(conf Service, params CliParams) Service {
 	// Checking the flags
 
 	// -- Key Count --
-	if *(params.UnsealKeyCount) > 0 {
-		conf.Vault.UnsealKeyCount = params.UnsealKeyCount
+	if *params.UnsealKeyCount > 0 {
+		conf.Vault.UnsealKeyCount = *params.UnsealKeyCount
 	}
 	// -- Check interval --
-	if params.Interval > 0 {
-		conf.Vault.CheckInterval = params.Interval
+	if *params.Interval > 0 {
+		conf.Vault.CheckInterval = *params.Interval
 	}
 
 	// -- Protocol --
 	// converting protocol to lowercase
-	prtcl := strings.ToLower(params.Protocol)
+	prtcl := strings.ToLower(*params.Protocol)
 	// and checking if its supported
 	if prtcl == "http" || prtcl == "https" {
-		conf.Vault.Protocol = params.Protocol
-	} else if len(params.Protocol) > 0 {
-		log.Printf("Unsupported protocol %s given on protocol flag. Using the one defined in the configuration file instead\n", params.Protocol)
+		conf.Vault.Protocol = *params.Protocol
+	} else if len(*params.Protocol) > 0 {
+		log.Printf("Unsupported protocol %s given on protocol flag. Using the one defined in the configuration file instead\n", *params.Protocol)
 	}
 
 	// -- Instances --
 	// Checking that if reset instance is givem, at least one instance is also given
-	if params.ResetInstances {
+	if *params.ResetInstances {
 		if len(params.Instances) == 0 {
 			log.Fatal("An instance reset was passed with no new instances. Nothing to work with, terminating")
 		}
@@ -75,29 +75,29 @@ func updateConfig(conf Service, params CliParams) Service {
 	}
 
 	// -- Pathing --
-	if len(params.StatusPath) > 0 {
-		conf.Vault.StatusPath = params.StatusPath // @TODO check its url legal
+	if len(*params.StatusPath) > 0 {
+		conf.Vault.StatusPath = *params.StatusPath // @TODO check its url legal
 	}
-	if len(params.UnsealPath) > 0 {
-		conf.Vault.UnsealPath = params.UnsealPath // @TODO check its url legal
+	if len(*params.UnsealPath) > 0 {
+		conf.Vault.UnsealPath = *params.UnsealPath // @TODO check its url legal
 	}
 
 	// -- Keys --
 	if len(params.Keys) > 0 {
 		// Checking for double entry
-		if len(params.KeyFile) > 0 {
+		if len(*params.KeyFile) > 0 {
 			log.Fatal("Cannot take both a key file and key parameters. Choose one or the other.\nOr better yet. Non of them\n")
 		}
 		conf.Keys = params.Keys[:]
 	}
-    log.Println("KeyFile:", params.KeyFile)
-	if len(params.KeyFile) > 0 {
+    log.Println("KeyFile:", *params.KeyFile)
+	if len(*params.KeyFile) > 0 {
 		var err error
 		// Read the keys of the file. Each line represents a key
-		filePath, _ := expand(params.KeyFile) // Supporting ~ in path
+		filePath, _ := expand(*params.KeyFile) // Supporting ~ in path
 		conf.Keys, err = loadKeyFile(filePath)
         if err != nil {
-			log.Fatalf("Failed to load keys from file %s\n", params.KeyFile)
+			log.Fatalf("Failed to load keys from file %s\n", *params.KeyFile)
 		}
 	}
 
