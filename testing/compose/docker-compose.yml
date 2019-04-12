@@ -12,7 +12,7 @@ services:
     volumes:
       - ./consul-config.hcl:/etc/consul.hcl
   consul-1:
-    image: consul
+    image: consul:latest
     command: agent -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=2 -config-file=/etc/consul.hcl -retry-join=consul-0
     ports:
       - "8300"
@@ -56,6 +56,7 @@ services:
       - IPC_LOCK
     ports:
       - "8200"
+      - "8201"
     volumes:
       - ./vault-config.hcl:/etc/vault.hcl
 
