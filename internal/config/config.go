@@ -31,7 +31,7 @@ func LoadConfiguration() *Service {
 
 	Load(configFile, &conf)
 	// Update with the CLI params
-	updateConfig(conf, cliParams)
+	conf = updateConfig(conf, cliParams)
 
 	return &conf
 }
@@ -90,7 +90,6 @@ func updateConfig(conf Service, params CliParams) Service {
 		}
 		conf.Keys = params.Keys[:]
 	}
-    log.Println("KeyFile:", *params.KeyFile)
 	if len(*params.KeyFile) > 0 {
 		var err error
 		// Read the keys of the file. Each line represents a key
@@ -100,7 +99,6 @@ func updateConfig(conf Service, params CliParams) Service {
 			log.Fatalf("Failed to load keys from file %s\n", *params.KeyFile)
 		}
 	}
-
 	return conf
 }
 
@@ -127,7 +125,6 @@ func loadKeyFile(filePath string) ([]string, error) {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-    log.Println("Keys loaded:", keys)
 	return keys, err
 }
 
