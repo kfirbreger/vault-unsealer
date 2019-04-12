@@ -12,7 +12,6 @@ import (
 func main() {
 	// Load config
 	conf := config.LoadConfiguration()
-	log.Println(*conf)
 	// Update with command line arguments
 	// @TODO add command line arguments handling
 
