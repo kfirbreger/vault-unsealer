@@ -25,5 +25,5 @@ COPY --from=build /go/src/github.com/kfirbreger/vault-unsealer/unsealer .
 COPY testing/compose/keys.txt /app/keys.txt
 COPY testing/compose/config.toml /app/config.toml
 
-CMD ["./unsealer", "-key-file", "keys.txt"]  
+CMD ["./unsealer", "-key-file=keys.txt"]  
  
