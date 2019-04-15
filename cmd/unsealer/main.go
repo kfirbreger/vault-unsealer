@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+    "time"
 
 	"github.com/kfirbreger/vault-unsealer/internal"
 	"github.com/kfirbreger/vault-unsealer/internal/config"
@@ -64,5 +65,6 @@ func main() {
 	log.Println("Monitoring started")
 	// Just let the program do its work
 	for {
+        time.Sleep(1 * time.Second)
 	}
 }
