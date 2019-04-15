@@ -49,6 +49,6 @@ func getCliParams() CliParams {
 	flag.Var(&params.Keys, "key", "An unsealing key. THIS IS UNSAFE! USE ONLY IN DEVELOPMENT")
 
 	flag.Parse()
-    log.Println("Command line arguments:", params)
+	log.Println("Command line arguments:", params)
 	return params
 }

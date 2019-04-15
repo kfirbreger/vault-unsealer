@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/awnumar/memguard"
 )
 
 const UNSEALCALLERROR = -1
+const UNSEALHTTPTIMEOUT = 600
 
 type Unsealparams struct {
 	Keys    []*memguard.LockedBuffer
@@ -38,19 +40,21 @@ func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, up
 func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
 	// Perform an unseal request over http(s)
 	// Again key is passed as pointer to prevent leaking to gc
-
 	// Creating a buffer with the key. This is unfortunaltely unavoidable
 	// TODO add reset and migrate options to the call
 	log.Println("Creating unseal request", key)
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(append([]byte(`{"key":"`), append((*key).Buffer(), []byte(`"}`)...)...)))
 	// Sending the request
-	client := &http.Client{}
+	timeout := time.Duration(UNSEALHTTPTIMEOUT * time.Millisecond)
+	client := &http.Client{
+		Timeout: timeout,
+	}
 	resp, err := client.Do(req)
 	// Making sure body is closed
 	if err != nil {
 		return UNSEALCALLERROR, err
-	} 
-    defer resp.Body.Close()
+	}
+	defer resp.Body.Close()
 	return resp.StatusCode, err
 }
 

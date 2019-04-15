@@ -95,7 +95,7 @@ func updateConfig(conf Service, params CliParams) Service {
 		// Read the keys of the file. Each line represents a key
 		filePath, _ := expand(*params.KeyFile) // Supporting ~ in path
 		conf.Keys, err = loadKeyFile(filePath)
-        if err != nil {
+		if err != nil {
 			log.Fatalf("Failed to load keys from file %s\n", *params.KeyFile)
 		}
 	}
