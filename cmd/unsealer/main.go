@@ -27,7 +27,7 @@ func main() {
 	// 3. Unseal workers
 	// 4. Status check generators
 	checkerQueue := make(chan internal.StatusCheckRequest, 100) // TODO make this service count * something
-	unsealQueue := make(chan internal.UnsealRequest, 50)       // TODO same here
+	unsealQueue := make(chan internal.UnsealRequest, 50)        // TODO same here
 	unsealNeededQueue := make(chan string, 50)
 	logChan := make(chan string, 10)
 	quitChan := make(chan bool, 10)

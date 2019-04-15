@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"log"
 	"net/http"
-    "time"
+	"time"
 
 	"github.com/awnumar/memguard"
 )
@@ -45,16 +45,16 @@ func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migr
 	log.Println("Creating unseal request", key)
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(append([]byte(`{"key":"`), append((*key).Buffer(), []byte(`"}`)...)...)))
 	// Sending the request
-    timeout := time.Duration(UNSEALHTTPTIMEOUT * time.Millisecond)
+	timeout := time.Duration(UNSEALHTTPTIMEOUT * time.Millisecond)
 	client := &http.Client{
-        Timeout: timeout,
-    }
+		Timeout: timeout,
+	}
 	resp, err := client.Do(req)
 	// Making sure body is closed
 	if err != nil {
 		return UNSEALCALLERROR, err
-	} 
-    defer resp.Body.Close()
+	}
+	defer resp.Body.Close()
 	return resp.StatusCode, err
 }
 

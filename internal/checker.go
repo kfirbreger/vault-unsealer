@@ -3,7 +3,7 @@ package internal
 import (
 	"log"
 	"net/http"
-    "time"
+	"time"
 )
 
 // Constanses for the manage channel
@@ -47,11 +47,11 @@ func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue ch
 // without significant change code
 func ExecCheckOverHttp(url string) (int, error) {
 	// Makeing a call, returning the status code, or error code
-    timeout := time.Duration(STATUSHTTPTIMEOUT * time.Millisecond)
-    client := http.Client{
-        Timeout: timeout,
-    }
-    resp, err := client.Get(url)
+	timeout := time.Duration(STATUSHTTPTIMEOUT * time.Millisecond)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	resp, err := client.Get(url)
 	// Debuging info
 	if err != nil {
 		log.Println("Error calling to Vault. is Vault sealed?")
