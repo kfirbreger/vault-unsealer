@@ -6,7 +6,7 @@ unseal_path = "/v1/sys/unseal"
 # Settings
 unseal_key_count = 3
 # Interval in ms
-seal_check_interval = 100
+seal_check_interval = 1000
 
 [workers]
 # The amout of workers to make
