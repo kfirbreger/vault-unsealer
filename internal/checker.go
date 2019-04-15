@@ -13,7 +13,7 @@ const PAUZE = 3
 const STATUS = 5
 
 // HTTP timeout
-const STATUSHTTPTIMEOUT = 600
+const STATUSHTTPTIMEOUT = 2000
 
 type Checker struct {
 	ID               int
@@ -45,7 +45,7 @@ func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue ch
 // this is set as a differenct function so that
 // the actual check can be done differently (like listening to kubernetes api)
 // without significant change code
-func ExecCheckOverHttp(url string) (int, error) {
+func ExecCheckOverHttp(id int, url string) (int, error) {
 	// Makeing a call, returning the status code, or error code
 	timeout := time.Duration(STATUSHTTPTIMEOUT * time.Millisecond)
 	client := http.Client{
@@ -54,11 +54,12 @@ func ExecCheckOverHttp(url string) (int, error) {
 	resp, err := client.Get(url)
 	// Debuging info
 	if err != nil {
-		log.Println("Error calling to Vault. is Vault sealed?")
+		log.Printf("Checker %d - Error calling to Vault.\n", id)
 		log.Println(err)
+        log.Println("Response is:", resp)
 		return -1, err
 	}
-	log.Println("StatusCode: ", resp.StatusCode)
+	log.Printf("Checker %d - StatusCode: %d\n", id, resp.StatusCode)
 	return resp.StatusCode, err
 }
 
@@ -72,14 +73,16 @@ func (c *Checker) Start() {
 				log.Printf("worker %d: Received check request for url %s\n", c.ID, work.Url)
 
 				c.CallsMade++
-				StatusCode, err := ExecCheckOverHttp(work.Url)
+				StatusCode, err := ExecCheckOverHttp(c.ID, work.Url)
 				// Checking vault status
 				if StatusCode == 503 { // TODO unseal conditions
 					c.UnsealRequests++
 					c.UnsealQueue <- work.Domain
 				} else if StatusCode > 199 && StatusCode < 300 && err == nil {
 					c.CallsSuccessful++
-				}
+				} else {
+                    log.Printf("Checker %d - Unknown status code %d\n", c.ID, StatusCode)
+                }
 
 			case cmd := <-c.ManageChan:
 				log.Printf("Command recieved: %d", cmd)
@@ -94,7 +97,9 @@ func (c *Checker) Start() {
 				default:
 					log.Printf("Command %d not (yet) supported", cmd)
 				}
-			}
+            default:
+			    continue
+            }
 		}
 	}()
 }

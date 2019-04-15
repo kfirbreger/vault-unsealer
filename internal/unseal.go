@@ -10,7 +10,7 @@ import (
 )
 
 const UNSEALCALLERROR = -1
-const UNSEALHTTPTIMEOUT = 600
+const UNSEALHTTPTIMEOUT = 2000
 
 type Unsealparams struct {
 	Keys    []*memguard.LockedBuffer
@@ -37,12 +37,12 @@ func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, up
 	return &unsealer
 }
 
-func ExecUnsealOverHttp(key *memguard.LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
+func ExecUnsealOverHttp(id int, key *memguard.LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
 	// Perform an unseal request over http(s)
 	// Again key is passed as pointer to prevent leaking to gc
 	// Creating a buffer with the key. This is unfortunaltely unavoidable
 	// TODO add reset and migrate options to the call
-	log.Println("Creating unseal request", key)
+	log.Printf("Unsealer %d - Creating unseal request %s", id, key)
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(append([]byte(`{"key":"`), append((*key).Buffer(), []byte(`"}`)...)...)))
 	// Sending the request
 	timeout := time.Duration(UNSEALHTTPTIMEOUT * time.Millisecond)
@@ -69,7 +69,7 @@ func (u *Unsealer) Start() {
 					log.Printf("Key %d is out of range\n", unsealRequest.KeyNumber)
 				}
 				log.Println("Unseal request recieved", u.params.Keys)
-				status, err := ExecUnsealOverHttp(u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
+				status, err := ExecUnsealOverHttp(u.ID, u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
 				if err != nil {
 					log.Println("Error sending unseal call")
 				}
@@ -83,6 +83,8 @@ func (u *Unsealer) Start() {
 				default:
 					log.Printf("Unsealer %d got unknown command %d\n", u.ID, cmd)
 				}
+            default:
+                continue
 			}
 		}
 	}()
