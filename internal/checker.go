@@ -77,7 +77,7 @@ func (c *Checker) Start() {
 		for {
 			select {
 			case work := <-c.StatusCheckQueue:
-				// Recieve work request
+				// Receive work request
 				log.Printf("worker %d: Received check request for url %s\n", c.ID, work.Url)
 
 				c.CallsMade++
