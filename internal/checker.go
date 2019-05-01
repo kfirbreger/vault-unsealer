@@ -7,14 +7,19 @@ import (
 )
 
 // Constanses for the manage channel
+// STOP - Stop the worker
 const STOP = 1
+// CONTINUE - Resume paused operation
 const CONTINUE = 2
-const PAUZE = 3
+// PAUSE - Pause the worker
+const PAUSE = 3
+// STATUS - Report on status
 const STATUS = 5
 
-// HTTP timeout
+// STATUSHTTPTIMEOUT - HTTP timeout
 const STATUSHTTPTIMEOUT = 2000
 
+// Checker worker
 type Checker struct {
 	ID               int
 	StatusCheckQueue chan StatusCheckRequest
@@ -26,6 +31,8 @@ type Checker struct {
 	UnsealRequests   int
 }
 
+// Create a new checker worker
+// The worker is just created, but is not yet working
 func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue chan string, logChan chan string) *Checker {
 	// Creating a new worker
 	checker := Checker{
@@ -45,7 +52,7 @@ func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue ch
 // this is set as a differenct function so that
 // the actual check can be done differently (like listening to kubernetes api)
 // without significant change code
-func ExecCheckOverHttp(id int, url string) (int, error) {
+func execCheckOverHttp(id int, url string) (int, error) {
 	// Makeing a call, returning the status code, or error code
 	timeout := time.Duration(STATUSHTTPTIMEOUT * time.Millisecond)
 	client := http.Client{
@@ -63,7 +70,7 @@ func ExecCheckOverHttp(id int, url string) (int, error) {
 	return resp.StatusCode, err
 }
 
-// @TODO replace all log with log channel publishing
+// Start - Start the worker
 func (c *Checker) Start() {
 	go func() {
 		for {
@@ -73,7 +80,7 @@ func (c *Checker) Start() {
 				log.Printf("worker %d: Received check request for url %s\n", c.ID, work.Url)
 
 				c.CallsMade++
-				StatusCode, err := ExecCheckOverHttp(c.ID, work.Url)
+				StatusCode, err := execCheckOverHttp(c.ID, work.Url)
 				// Checking vault status
 				if StatusCode == 503 { // TODO unseal conditions
 					c.UnsealRequests++
@@ -104,7 +111,7 @@ func (c *Checker) Start() {
 	}()
 }
 
-// Adding worker stop function
+// Stop - Stops the worker
 func (c *Checker) Stop() {
 	c.ManageChan <- STOP
 }
