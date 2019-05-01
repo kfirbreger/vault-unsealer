@@ -19,6 +19,7 @@ func (v *multiValueFlags) Set(value string) error {
 	return nil
 }
 
+// CliParams - The command line arguments options.
 type CliParams struct {
 	ConfigFile     *string
 	UnsealKeyCount *int

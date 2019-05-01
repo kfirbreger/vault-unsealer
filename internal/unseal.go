@@ -9,15 +9,19 @@ import (
 	"github.com/awnumar/memguard"
 )
 
+// UNSEALCALLERROR - What value to return on un seal call error 
 const UNSEALCALLERROR = -1
+// UNSEALHTTPTIMEOUT - Unsealer call timeout
 const UNSEALHTTPTIMEOUT = 2000
 
+// Unsealparams - The parameters for the unseal call
 type Unsealparams struct {
 	Keys    []*memguard.LockedBuffer
 	Reset   bool
 	Migrate bool
 }
 
+// Unsealer - The unsealer type
 type Unsealer struct {
 	ID          int
 	UnsealQueue chan UnsealRequest
@@ -26,6 +30,7 @@ type Unsealer struct {
 	params      *Unsealparams
 }
 
+// NewUnsealer - Generate a new unsealer
 func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, up *Unsealparams) *Unsealer {
 	unsealer := Unsealer{
 		ID:          id,
@@ -37,7 +42,7 @@ func NewUnsealer(id int, unsealQueue chan UnsealRequest, logChan chan string, up
 	return &unsealer
 }
 
-func ExecUnsealOverHttp(id int, key *memguard.LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
+func execUnsealOverHttp(id int, key *memguard.LockedBuffer, url string, reset bool, migrate bool) (status int, err error) {
 	// Perform an unseal request over http(s)
 	// Again key is passed as pointer to prevent leaking to gc
 	// Creating a buffer with the key. This is unfortunaltely unavoidable
@@ -58,6 +63,7 @@ func ExecUnsealOverHttp(id int, key *memguard.LockedBuffer, url string, reset bo
 	return resp.StatusCode, err
 }
 
+// Start - Start the unsealer
 func (u *Unsealer) Start() {
 	go func() {
 		for {
@@ -69,7 +75,7 @@ func (u *Unsealer) Start() {
 					log.Printf("Key %d is out of range\n", unsealRequest.KeyNumber)
 				}
 				log.Println("Unseal request received", u.params.Keys)
-				status, err := ExecUnsealOverHttp(u.ID, u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
+				status, err := execUnsealOverHttp(u.ID, u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
 				if err != nil {
 					log.Println("Error sending unseal call")
 				}
@@ -90,6 +96,7 @@ func (u *Unsealer) Start() {
 	}()
 }
 
+// Stop - Stops the unsealer
 func (u *Unsealer) Stop() {
 	u.ManageChan <- STOP
 }
