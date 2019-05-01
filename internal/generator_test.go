@@ -72,7 +72,7 @@ func TestCreateUnsealRequestPerKey(t *testing.T) {
 
 	requestCounter := 0
 	startTime := timestamp()
-	endTime := int64(0)
+	var endTime int64
 
 	// Labels are awesome
 testCounter:
