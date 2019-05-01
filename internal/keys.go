@@ -27,7 +27,7 @@ func GetUnsealKeys(keyCount int, configKeys []string) []*memguard.LockedBuffer {
 	}
 
 	reader := bufio.NewReader(os.Stdin)
-	var singleKey = make([]byte, 0)
+	var singleKey []byte
 	var err error
 
 	for i := 0; i < keyCount; i++ {
