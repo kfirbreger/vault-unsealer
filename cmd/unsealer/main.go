@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-    "time"
+	"time"
 
 	"github.com/kfirbreger/vault-unsealer/internal"
 	"github.com/kfirbreger/vault-unsealer/internal/config"
@@ -18,7 +18,7 @@ func main() {
 
 	// Retrieve unseal keys, and put them
 	// in a memguard array. Only one copy is
-    // allowed to exist to all references will
+	// allowed to exist to all references will
 	// be done via pointers to prevent gc from
 	// moving the keys around
 	keys := internal.GetUnsealKeys(conf.Vault.UnsealKeyCount, conf.Keys)
@@ -65,6 +65,6 @@ func main() {
 	log.Println("Monitoring started")
 	// Just let the program do its work
 	for {
-        time.Sleep(1 * time.Second)
+		time.Sleep(1 * time.Second)
 	}
 }

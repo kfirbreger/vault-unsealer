@@ -3,7 +3,7 @@ package internal
 import (
 	"bufio"
 	"bytes"
-    "fmt"
+	"fmt"
 	"log"
 	"os"
 
@@ -23,16 +23,16 @@ func GetUnsealKeys(keyCount int, configKeys []string) []*memguard.LockedBuffer {
 		readKeys = false
 		log.Println("Keys given via CLI.")
 	} else {
-        fmt.Printf("Unsealing keys needed. You will be asked for %d keys\n", keyCount)
-    }
+		fmt.Printf("Unsealing keys needed. You will be asked for %d keys\n", keyCount)
+	}
 
 	reader := bufio.NewReader(os.Stdin)
 	var singleKey = make([]byte, 0)
 	var err error
-    
+
 	for i := 0; i < keyCount; i++ {
 		if readKeys {
-            fmt.Printf("Unseal key #%d: ", (i + 1))
+			fmt.Printf("Unseal key #%d: ", (i + 1))
 			singleKey, err = reader.ReadBytes('\n')
 			if err != nil {
 				log.Fatal(err)

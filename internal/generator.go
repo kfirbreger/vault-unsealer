@@ -13,10 +13,10 @@ const UNSEALSLEEP = 100
 // GenerateChecks - Generate check work
 func GenerateChecks(statusCheck chan<- StatusCheckRequest, quitChan chan bool, domain string, protocol string, statusPath string, interval int) {
 	// Adding a / if not present
-    if string(statusPath[0]) != "/" {
-        statusPath = "/" + statusPath
-    }
-    // Making a map with the params
+	if string(statusPath[0]) != "/" {
+		statusPath = "/" + statusPath
+	}
+	// Making a map with the params
 	url := protocol + "://" + domain + statusPath
 	// Defining the other parameters
 	name := "Status check for" + domain
@@ -47,10 +47,10 @@ func GenerateUnseal(unsealNeeded <-chan string, quitChan chan bool, unsealReques
 			return
 		case domain := <-unsealNeeded:
 			// Adding a / if not present
-            if string(unsealPath[0]) != "/" {
-                unsealPath = "/" + unsealPath
-            }
-            url := protocol + "://" + domain + unsealPath
+			if string(unsealPath[0]) != "/" {
+				unsealPath = "/" + unsealPath
+			}
+			url := protocol + "://" + domain + unsealPath
 			// Defining the other parameters
 			for i := 0; i < unsealKeyCount; i++ {
 				name := "Unseal request for " + domain + " with key " + strconv.Itoa(i)

@@ -10,10 +10,13 @@ import (
 
 // STOP - Stop the worker
 const STOP = 1
+
 // CONTINUE - Resume paused operation
 const CONTINUE = 2
+
 // PAUSE - Pause the worker
 const PAUSE = 3
+
 // STATUS - Report on status
 const STATUS = 5
 
@@ -64,7 +67,7 @@ func execCheckOverHttp(id int, url string) (int, error) {
 	if err != nil {
 		log.Printf("Checker %d - Error calling to Vault.\n", id)
 		log.Println(err)
-        log.Println("Response is:", resp)
+		log.Println("Response is:", resp)
 		return -1, err
 	}
 	log.Printf("Checker %d - StatusCode: %d\n", id, resp.StatusCode)
@@ -89,8 +92,8 @@ func (c *Checker) Start() {
 				} else if StatusCode > 199 && StatusCode < 300 && err == nil {
 					c.CallsSuccessful++
 				} else {
-                    log.Printf("Checker %d - Unknown status code %d\n", c.ID, StatusCode)
-                }
+					log.Printf("Checker %d - Unknown status code %d\n", c.ID, StatusCode)
+				}
 
 			case cmd := <-c.ManageChan:
 				log.Printf("Command received: %d", cmd)
@@ -105,9 +108,9 @@ func (c *Checker) Start() {
 				default:
 					log.Printf("Command %d not (yet) supported", cmd)
 				}
-            default:
-			    continue
-            }
+			default:
+				continue
+			}
 		}
 	}()
 }

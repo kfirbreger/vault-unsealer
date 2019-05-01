@@ -9,8 +9,9 @@ import (
 	"github.com/awnumar/memguard"
 )
 
-// UNSEALCALLERROR - What value to return on un seal call error 
+// UNSEALCALLERROR - What value to return on un seal call error
 const UNSEALCALLERROR = -1
+
 // UNSEALHTTPTIMEOUT - Unsealer call timeout
 const UNSEALHTTPTIMEOUT = 2000
 
@@ -89,8 +90,8 @@ func (u *Unsealer) Start() {
 				default:
 					log.Printf("Unsealer %d got unknown command %d\n", u.ID, cmd)
 				}
-            default:
-                continue
+			default:
+				continue
 			}
 		}
 	}()
