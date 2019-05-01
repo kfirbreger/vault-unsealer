@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// LoadConfiguration - Load the configuration for the service.
 func LoadConfiguration() *Service {
 	var conf Service
 	cliParams := getCliParams()

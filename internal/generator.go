@@ -6,10 +6,11 @@ import (
 	"time"
 )
 
-// After generating unseal calls, how long shall the generator pause
+// UNSEALSLEEP - After generating unseal calls, how long shall the generator pause
 // before looking for other unsealing calls
 const UNSEALSLEEP = 100
 
+// GenerateChecks - Generate check work
 func GenerateChecks(statusCheck chan<- StatusCheckRequest, quitChan chan bool, domain string, protocol string, statusPath string, interval int) {
 	// Adding a / if not present
     if string(statusPath[0]) != "/" {
@@ -37,6 +38,7 @@ func GenerateChecks(statusCheck chan<- StatusCheckRequest, quitChan chan bool, d
 	}
 }
 
+// GenerateUnseal - Generate unseal work
 func GenerateUnseal(unsealNeeded <-chan string, quitChan chan bool, unsealRequest chan<- UnsealRequest, protocol string, unsealPath string, unsealKeyCount int) {
 	for {
 		select {

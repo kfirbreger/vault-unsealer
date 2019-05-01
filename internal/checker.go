@@ -32,7 +32,7 @@ type Checker struct {
 	UnsealRequests   int
 }
 
-// Create a new checker worker
+// NewChecker - Create a new checker worker
 // The worker is just created, but is not yet working
 func NewChecker(id int, statusCheckQueue chan StatusCheckRequest, unsealQueue chan string, logChan chan string) *Checker {
 	// Creating a new worker

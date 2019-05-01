@@ -10,6 +10,9 @@ import (
 	"github.com/awnumar/memguard"
 )
 
+// GetUnsealKeys - Retreives the unsealing keys. Preferably via
+// direct input, otherwise via command line parameters. The keys are
+// saved in memguard buffers
 func GetUnsealKeys(keyCount int, configKeys []string) []*memguard.LockedBuffer {
 	// Save the unsealing keys in a slice
 	keys := make([]*memguard.LockedBuffer, 0, keyCount)
