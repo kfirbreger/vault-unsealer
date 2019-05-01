@@ -7,6 +7,7 @@ import (
 )
 
 // Constanses for the manage channel
+
 // STOP - Stop the worker
 const STOP = 1
 // CONTINUE - Resume paused operation

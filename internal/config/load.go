@@ -6,12 +6,12 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// A type for the instance url
+// Instance - A type for the instance url
 type Instance struct {
 	Domain string
 }
 
-// The Vault configuration
+// VaultConf - The Vault configuration
 // How to call, where to call, and how often to call
 type VaultConf struct {
 	Protocol       string
@@ -21,14 +21,14 @@ type VaultConf struct {
 	CheckInterval  int    `toml:"seal_check_interval"`
 }
 
-// The workers configuration
+// WorkersConf - The workers configuration
 type WorkersConf struct {
 	StatusCheckCount int `toml:"status_check"`
 	UnsealCount      int `toml:"unseal"`
 	LoggingCount     int `toml:"logging"`
 }
 
-// The overarching configuration type
+// Service - The overarching configuration type
 type Service struct {
 	Vault   VaultConf
 	Workers WorkersConf
