@@ -1,4 +1,4 @@
-![https://goreportcard.com/badge/github.com/kfirbreger/vault-unsealer]
+[![Go report card](https://goreportcard.com/badge/github.com/kfirbreger/vault-unsealer)]
 # Vault unsealer
 Since version 1.0, Vault offers auto unsealing functionality out of the box. For that it uses a public cloud infrastrcture(such as AWS, Azure and Gcloud), to securly store the vault master key.
 if you can leverage those services, that should definitely be the way to go. However, there are times in which such services cannot be used(closed networks i.e.). On such systems
