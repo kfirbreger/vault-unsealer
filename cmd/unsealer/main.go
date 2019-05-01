@@ -18,7 +18,7 @@ func main() {
 
 	// Retrieve unseal keys, and put them
 	// in a memguard array. Only one copy is
-	// allowed to exist to all refrences will
+    // allowed to exist to all references will
 	// be done via pointers to prevent gc from
 	// moving the keys around
 	keys := internal.GetUnsealKeys(conf.Vault.UnsealKeyCount, conf.Keys)

@@ -68,7 +68,7 @@ func (u *Unsealer) Start() {
 					// Making sure there is a key available
 					log.Printf("Key %d is out of range\n", unsealRequest.KeyNumber)
 				}
-				log.Println("Unseal request recieved", u.params.Keys)
+				log.Println("Unseal request received", u.params.Keys)
 				status, err := ExecUnsealOverHttp(u.ID, u.params.Keys[unsealRequest.KeyNumber], unsealRequest.Url, u.params.Reset, u.params.Migrate)
 				if err != nil {
 					log.Println("Error sending unseal call")

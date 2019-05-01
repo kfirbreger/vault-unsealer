@@ -93,7 +93,7 @@ func (c *Checker) Start() {
                 }
 
 			case cmd := <-c.ManageChan:
-				log.Printf("Command recieved: %d", cmd)
+				log.Printf("Command received: %d", cmd)
 				switch cmd {
 				case STOP:
 					log.Printf("Worker %d quitting", c.ID)
